@@ -18,12 +18,12 @@ There are 3 ways to interact with the Query Expander:
 The URI for expansion is set by the 'inputURI' HTTP POST/GET parameter.
 Matching URLs will be used to expand the the variables hardcoded in sparql/ops_ims.class.php : 
 
-  '?cw_uri' , '?cs_uri' , '?db_uri' , '?chembl_uri' , and '?uniprot_uri'
+     '?cw_uri' , '?cs_uri' , '?db_uri' , '?chembl_uri' , and '?uniprot_uri'
 
 # Implicit mode
 If the 'query' HTTP POST/GET parameter is not set, the script will look for the BGP:
 
-  [] ops:input <http://example.org/uri1>
+     [] ops:input <http://example.org/uri1>
 
 If found, the object of the BGP will be used as the 'inputURI' and expansion is carried out as above. The BGP is then removed from the SPARQL query before it is evaluated. Note that the script will not do prefix expansion, but only syntactic checking for the ops:input predicate.
 
@@ -37,12 +37,12 @@ Examples
 --------
 In summary, the following requests are equivalent:
 
-http://localhost/sparql/?query=SELECT * WHERE { <http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5> ?p ?o }
+     http://localhost/sparql/?query=SELECT * WHERE { <http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5> ?p ?o }
 
-http://localhost/sparql/?query=SELECT * WHERE { ?cw_uri ?p ?o }&inputURI=http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5
+     http://localhost/sparql/?query=SELECT * WHERE { ?cw_uri ?p ?o }&inputURI=http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5
 
-http://localhost/sparql/?query=SELECT * WHERE { [] ops:input <http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5> . ?cw_uri ?p ?o }
+     http://localhost/sparql/?query=SELECT * WHERE { [] ops:input <http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5> . ?cw_uri ?p ?o }
 
 ####Graph Example
 
-http://localhost/sparql/?query=SELECT * WHERE { GRAPH <http://www.conceptwiki.org> { ?cw_uri ?p1 ?o1 } GRAPH <http://data.kasabi.com/dataset/chembl-rdf> { ?chembl_url ?p2 ?o2} GRAPH <http://www.chemspider.com> { ?cs_uri ?p3 ?o3 } GRAPH <http://linkedlifedata.com/resource/drugbank> { ?db_uri ?p4 ?o4 } }
+     http://localhost/sparql/?query=SELECT * WHERE { GRAPH <http://www.conceptwiki.org> { ?cw_uri ?p1 ?o1 } GRAPH <http://data.kasabi.com/dataset/chembl-rdf> { ?chembl_url ?p2 ?o2} GRAPH <http://www.chemspider.com> { ?cs_uri ?p3 ?o3 } GRAPH <http://linkedlifedata.com/resource/drugbank> { ?db_uri ?p4 ?o4 } }
