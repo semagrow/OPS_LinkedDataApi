@@ -45,4 +45,6 @@ In summary, the following requests are equivalent:
 
 ####Graph Example
 
-     http://localhost/sparql/?query=SELECT * WHERE { GRAPH <http://www.conceptwiki.org> { ?cw_uri ?p1 ?o1 } GRAPH <http://data.kasabi.com/dataset/chembl-rdf> { ?chembl_uri ?p2 ?o2} GRAPH <http://www.chemspider.com> { ?cs_uri ?p3 ?o3 } GRAPH <http://linkedlifedata.com/resource/drugbank> { ?db_uri ?p4 ?o4 } }&inputURI=http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5
+Note that because of the way this query is written, the number of results is the product of all predicates in each graph, hence the LIMIT 100
+
+     http://localhost/sparql/?query=SELECT * WHERE { GRAPH <http://www.conceptwiki.org> { ?cw_uri ?p1 ?o1 } GRAPH <http://data.kasabi.com/dataset/chembl-rdf> { ?chembl_uri ?p2 ?o2} GRAPH <http://www.chemspider.com> { ?cs_uri ?p3 ?o3 } GRAPH <http://linkedlifedata.com/resource/drugbank> { ?db_uri ?p4 ?o4 } } LIMIT 100&inputURI=http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5
