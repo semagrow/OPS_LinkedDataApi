@@ -17,7 +17,7 @@ else {
 }
 
 function runQuery ( $query ) {
-	$VirtuosoEndpoint = "http://ops2.few.vu.nl:8890/sparql/";
+	$VirtuosoEndpoint = "http://localhost:8890/sparql/";
 	$ims = new OpsIms();
 	$formatter = new VirtuosoFormatter();
 	$inputURI='';
