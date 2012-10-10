@@ -3,8 +3,10 @@
 class OpsIms {
 
 	function expandQuery ( $query , $input_uri ) {
+		global $QUERY_EXPANDER_URI;
+
 		$variables = array('?cw_uri' , '?cs_uri' , '?db_uri' , '?chembl_uri' , '?uniprot_uri');
-		$url = 'http://openphacts.cs.man.ac.uk:9090/QueryExpander/expandXML?query=' ;
+		$url = $QUERY_EXPANDER_URI.'expandXML?query=' ;
 		$url .= urlencode($query) ;
 		$params='';
 		foreach ($variables as &$var) {
