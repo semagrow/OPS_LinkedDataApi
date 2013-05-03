@@ -12,7 +12,7 @@ Puelia will create some directories for logging and caching the first time you r
 
 
 To run the unit tests, make sure PHPUnit is installed and  in path. and run tests/puelia-runtests.php
-
+ 
 lda.inc.php contains constants which control caching behaviour
   
 
