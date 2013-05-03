@@ -12,12 +12,12 @@ Puelia will create some directories for logging and caching the first time you r
 
 
 To run the unit tests, make sure PHPUnit is installed and  in path. and run tests/puelia-runtests.php
- 
+
 lda.inc.php contains constants which control caching behaviour
   
- 
+
 Moriarty is the PHP library (included) that Puelia uses to make requests to SPARQL endpoints. It can cache the responses it gets.
-  
+
 MORIARTY_ALWAYS_CACHE_EVERYTHING, if defined, ensures that all successful responses from upstream servers will be cached
  
 See http://code.google.com/p/moriarty for more information on moriarty's caching capabilities.
