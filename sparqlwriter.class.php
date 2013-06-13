@@ -594,46 +594,49 @@ _SPARQL_;
 
         $fromClause = $this->getFromClause();
         #Antonis botch
-	$limit = $this->getLimit();
+		$limit = $this->getLimit();
         if(($template = $this->_request->getParam('_template') OR $template = $this->_config->getViewerTemplate($viewerUri)) AND !empty($template)
         AND $whereGraph = $this->_config->getViewerWhere($viewerUri) AND !empty($whereGraph)
         AND $ops_uri = $this->_request->getParam('uri') AND !empty($ops_uri)){
             $query='Something went wrong';
-	    if ($this->_config->getEndpointType() == API.'ListEndpoint'){
-                $query = str_replace('?ops_item', '<'.$ops_uri.'>', $this->addPrefixesToQuery("CONSTRUCT { {$template}  } {$fromClause} WHERE { " .  $whereGraph  . " }"));
-	    }
-	    else {	
-            	$query = str_replace('?ops_item', '<'.$ops_uri.'>', $this->addPrefixesToQuery("CONSTRUCT { {$template}  } {$fromClause} WHERE { " . preg_replace('/GRAPH/i',  $this->getFilterGraph() . "\n GRAPH", $whereGraph , 1) . " }"));
-	    }
+		    if ($this->_config->getEndpointType() == API.'ListEndpoint'){
+	                $query = str_replace('?ops_item', '<'.$ops_uri.'>', $this->addPrefixesToQuery("CONSTRUCT { {$template}  } {$fromClause} WHERE { " .  $whereGraph  . " }"));
+		    }
+		    else {	
+	            	$query = str_replace('?ops_item', '<'.$ops_uri.'>', $this->addPrefixesToQuery("CONSTRUCT { {$template}  } {$fromClause} WHERE { " . preg_replace('/GRAPH/i',  $this->getFilterGraph() . "\n GRAPH", $whereGraph , 1) . " }"));
+		    }
             $ims = new OpsIms();
-	    $expandedQuery = $ims->expandQuery($query, $ops_uri);
-	    if ($this->_config->getEndpointType() == API.'ListEndpoint' AND strcasecmp($limit,"all")!==0) {
-	    	$expandedQuery = substr($expandedQuery, 0, strrpos($expandedQuery,"}")-1) . "\n FILTER ( ";
-	   	foreach($uriList as $uri) {
-			$expandedQuery .= "?item = <{$uri}> || ";
-	    	}
-	    	$expandedQuery = substr($expandedQuery, 0, strlen($expandedQuery) - 3);
-	    	$expandedQuery .= ") }";
-	    }
+	    	$expandedQuery = $ims->expandQuery($query, $ops_uri);
+		    if ($this->_config->getEndpointType() == API.'ListEndpoint' AND strcasecmp($limit,"all")!==0) {
+		    	$expandedQuery = substr($expandedQuery, 0, strrpos($expandedQuery,"}")-1) . "\n FILTER ( ";
+			   	foreach($uriList as $uri) {
+					$expandedQuery .= "?item = <{$uri}> || ";
+		    	}
+		    	$expandedQuery = substr($expandedQuery, 0, strlen($expandedQuery) - 3);
+		    	$expandedQuery .= ") }";
+		    }
             $formatter = new VirtuosoFormatter();
             return $formatter->formatQuery($expandedQuery);
-        } else if(($template = $this->_request->getParam('_template') OR $template = $this->_config->getViewerTemplate($viewerUri)) AND !empty($template)){
+        } 
+        else if(($template = $this->_request->getParam('_template') OR $template = $this->_config->getViewerTemplate($viewerUri)) AND !empty($template)){
             $query = $this->addPrefixesToQuery("CONSTRUCT { {$template} } {$fromClause} WHERE { {$this->_config->getViewerWhere($viewerUri)}  }");
             $ims = new OpsIms();
             $expandedQuery = $ims->expandQuery($query, $ops_uri);
-	    if ($this->_config->getEndpointType() == API.'ListEndpoint' AND strcasecmp($limit,"all")!==0) {
-            	$expandedQuery = substr($expandedQuery, 0, strrpos($expandedQuery,"}")-1) . "\n FILTER ( ";
-            	foreach($uriList as $uri) {
-                	$expandedQuery .= "?item = <{$uri}> || ";
-            	}
-            	$expandedQuery = substr($expandedQuery, 0, strlen($expandedQuery) - 3);
-            	$expandedQuery .= ") }";
-	    }
+		    if ($this->_config->getEndpointType() == API.'ListEndpoint' AND strcasecmp($limit,"all")!==0) {
+	            	$expandedQuery = substr($expandedQuery, 0, strrpos($expandedQuery,"}")-1) . "\n FILTER ( ";
+	            	foreach($uriList as $uri) {
+	                	$expandedQuery .= "?item = <{$uri}> || ";
+	            	}
+	            	$expandedQuery = substr($expandedQuery, 0, strlen($expandedQuery) - 3);
+	            	$expandedQuery .= ") }";
+		    }
             $formatter = new VirtuosoFormatter();
             return $formatter->formatQuery($expandedQuery);
-        } else if($viewerUri==API.'describeViewer' AND strlen($this->_request->getParam('_properties')) === 0 ){
+        } 
+        else if($viewerUri==API.'describeViewer' AND strlen($this->_request->getParam('_properties')) === 0 ){
             return 'DESCRIBE <'.implode('> <', $uriList).'>'.$fromClause;
-        } else {
+        } 
+        else {
             $namespaces = $this->getConfigGraph()->getPrefixesFromLoadedTurtle();
             $conditionsGraph = '';
             $whereGraph = '';

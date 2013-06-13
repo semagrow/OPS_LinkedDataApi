@@ -104,6 +104,7 @@ class LinkedDataApiResponse {
             logDebug("Viewer URI: " . $viewerUri);
             
             if($this->SanitizationHandler->hasUnknownPropertiesFromRequest()){
+            	$param = implode(', ', $this->SanitizationHandler->getUnknownPropertiesFromRequest());
                 $this->errorMessages[]="Unknown Properties in Request: {$param}";
                 $this->setStatusCode(HTTP_Bad_Request);
                 $this->serve();
@@ -162,6 +163,9 @@ class LinkedDataApiResponse {
             case API.'ItemEndpoint' :
                 $this->loadDataFromItem();
                 break;
+            case API.'BatchEndpoint' :
+                $this->loadDataFromBatch();
+                break;
             case API.'ExternalHTTPService' :
                 $this->loadDataFromExternalService();
                 break;
@@ -177,6 +181,55 @@ class LinkedDataApiResponse {
         
         $this->addMetadataToPage();
         
+    }
+    
+    function loadDataFromBatch(){
+    	$uri_list = $this->ConfigGraph->getCompletedItemTemplatesFromList();
+    	$this->list_of_item_uris = $uri_list;
+    	#TO DO: Call IMS and add 'skos:excactMatch's to DataGraph
+    	$viewerUri = $this->getViewer();
+    	/*$this->viewQuery  = $this->SparqlWriter->getViewQueryForBatch($this->getListOfUris(), $viewerUri);
+    	if (LOG_VIEW_QUERIES) {
+    		logViewQuery($this->Request, $this->viewQuery);
+    	}
+    	
+    	$response = $this->SparqlEndpoint->graph($this->viewQuery, PUELIA_RDF_ACCEPT_MIMES);
+    	$pageUri = $this->Request->getUriWithoutPageParam();
+    	if($response->is_success()){
+    		$rdf = $response->body;
+    		$this->DataGraph->add_rdf($rdf);
+    	
+    		if ($this->DataGraph->is_empty()){
+    			$this->setStatusCode(HTTP_Not_Found);
+    			logError("Data not found in the triple store");
+    			$this->serve();
+    			return;
+    		}
+    	}*/
+    	$listUri = $this->Request->getUriWithoutParam(array('_view', '_page'), 'strip extension');
+    	$this->listUri = $listUri;
+    	$this->DataGraph->add_rdf('<http://foo> <http://bar> <http://barfoo> .
+    			<http://barfoo> <http://foo> <http://bar> .');
+    	$this->DataGraph->add_resource_triple($listUri, API.'definition', $this->endpointUrl);
+    	$this->DataGraph->add_resource_triple($listUri, RDF_TYPE, API.'List');
+    	$this->DataGraph->add_literal_triple($listUri, DCT.'modified', date("Y-m-d\TH:i:s"), null, XSD.'dateTime' );
+    	$rdfListUri = '_:itemsList';
+    	$this->DataGraph->add_resource_triple($listUri, API.'items', $rdfListUri);
+    	$this->DataGraph->add_resource_triple($rdfListUri, RDF_TYPE, RDF_LIST);
+    	$this->DataGraph->add_resource_triple($rdfListUri, RDF_TYPE, RDF_LIST);
+    	foreach($uri_list as $no => $resourceUri){
+    		$nextNo = ($no+1);
+    		$nextList = (($no+1) == count($uri_list))? RDF_NIL : '_:itemsList'.$nextNo;
+    		$this->DataGraph->add_resource_triple($rdfListUri, RDF_FIRST, $resourceUri);
+    		$this->DataGraph->add_resource_triple($rdfListUri, RDF_REST, $nextList);
+    		$rdfListUri = $nextList;
+    	}
+    	$this->DataGraph->add_rdf('<http://openphacts.cs.man.ac.uk:9090/OPS-IMS/mapping/4468833> <http://rdfs.org/ns/void#inDataset> <http://openphacts.cs.man.ac.uk:9090/OPS-IMS/linkset/15/ConceptWiki> .
+<http://openphacts.cs.man.ac.uk:9090/OPS-IMS/linkset/15/ConceptWiki> <http://rdfs.org/ns/void#linkPredicate> <http://www.w3.org/2004/02/skos/core#exactMatch> .
+<http://www.conceptwiki.org/concept/38932552-111f-4a4e-a46a-4ed1d7bdf9d5> <http://www.w3.org/2004/02/skos/core#exactMatch> <http://purl.uniprot.org/uniprot/Q14573> .
+<http://www.conceptwiki.org/concept/b30b0765-c297-41e9-aac8-75b13e495495> <http://www.w3.org/2004/02/skos/core#exactMatch> <http://purl.uniprot.org/uniprot/Q14573> .
+<http://www.conceptwiki.org/concept/b30b0765-c297-41e9-aac8-75b13e495495> <http://www.w3.org/2004/02/skos/core#exactMatch> <http://www.uniprot.org/uniprot/Q14573>  .');
+    	return;
     }
 
     function loadDataFromItem(){
@@ -546,7 +599,6 @@ class LinkedDataApiResponse {
             $this->serve();
         }
         #Antonis botch
-        logDebug($this->selectQuery);
         $response = $this->SparqlEndpoint->query($this->selectQuery, PUELIA_SPARQL_ACCEPT_MIMES);
 
         if($response->is_success()){
@@ -993,12 +1045,12 @@ class LinkedDataApiResponse {
 	        $endpointType = $this->ConfigGraph->getEndpointType();
 	        switch($endpointType){
 	            case API.'ListEndpoint' :
-	                #Antonis botch
-	            case API.'OPSListEndpoint':
+	            case API.'BatchEndpoint':
 	            case PUELIA.'SearchEndpoint':
 	                $pageUri = $this->Request->getUriWithPageParam();
 	                break;
-	            case API.'ItemEndpoint': case API.'ExternalHTTPService':
+	            case API.'ItemEndpoint': 
+            	case API.'ExternalHTTPService':
 	                $pageUri = $this->Request->getUri();
 	                break;
 	            default:

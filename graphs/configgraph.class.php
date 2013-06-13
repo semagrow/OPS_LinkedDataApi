@@ -385,15 +385,24 @@ class ConfigGraph extends PueliaGraph {
     
     function bindVariablesInValue($value, $variables, $valueType=false){
         foreach($variables as $name => $props){
-            if(($valueType==RDFS.'Resource' AND 
-                    isset($props['source']) AND $props['source']=='request' 
-                    AND $name != 'uri')) {
+        	#Not used ?!?!
+            #if(($valueType==RDFS.'Resource' AND 
+            #        isset($props['source']) AND $props['source']=='request' 
+            #        AND $name != 'uri')) {
                 # Antonis botch
-                $props['value'] = urlencode($props['value']);
-            }
-            
-            $value = str_replace('{'.$name.'}', $props['value'], $value);
+                #$props['value'] = urlencode($props['value']);
+            #}
+            if ($name !== 'list')
+            	$value = str_replace('{'.$name.'}', $props['value'], $value);
+        	else {
+        		$list = explode('|', $props['value']);
+        		foreach ($list as $item) {
+        			$values[] = str_replace('{list}', $item, $value);
+        		}
+        	}
         }
+        if (isset($values))
+        	return $values;
         return $value;
     }
     
@@ -412,6 +421,12 @@ class ConfigGraph extends PueliaGraph {
         
         $filledInTemplate = $this->bindVariablesInValue($itemTemplate, $bindings, RDFS.'Resource' );
         return $filledInTemplate;
+    }
+    
+    
+    function getCompletedItemTemplatesFromList() {
+    	logDebug("******".implode($this->getCompletedItemTemplate()));
+    	return $this->getCompletedItemTemplate();
     }
     
     function getExternalServiceRequest(){
@@ -444,7 +459,6 @@ class ConfigGraph extends PueliaGraph {
         $filledInUriTemplate = $this->bindURLEncodedVariablesInValue($uriTemplate, $bindings);
         return $filledInUriTemplate;
     }
-
 
     /**
      * dataUriToEndpointItem
