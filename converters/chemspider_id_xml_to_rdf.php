@@ -1,5 +1,5 @@
 <?php
-//the input data is in the $response variable in xml format
+//the input data is in the $response variable in json format
 //the output is put in $rdfData in NTriples format
 //Conversion example for InChI to CSID: 
 //Request: 
@@ -37,6 +37,7 @@ $unreservedParameters = $this->Request->getUnreservedParams();
 $paramName = $this->ConfigGraph->get_first_literal($inputNode, API.'label');//'inchi' or 'inchikey'
 $paramValue = $unreservedParameters[$paramName];                        
 
+//link the CSID to the inchi/inchikey value
 $this->DataGraph->add_literal_triple($fullCSID, $inputNode, $paramValue);
 
 $rdfData = $this->DataGraph->to_ntriples();//assuming nothing else is in the graph
