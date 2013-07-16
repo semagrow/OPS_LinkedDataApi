@@ -1,4 +1,5 @@
 @base <http://www.openphacts.org/api> .
+@prefix ops: <http://www.openphacts.org/api#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix api: <http://purl.org/linked-data/api/vocab#> .
@@ -37,9 +38,9 @@
 	api:template "
 {pageUri} foaf:primaryTopic ?primaryTopic .
 ?primaryTopic foaf:isPrimaryTopicOf {pageUri} .
-?primaryTopic chemspider:smiles ?smiles ." ;
+?primaryTopic ops:smiles ?smiles ." ;
 
 	api:where "
 GRAPH <{result_hash}> {
-	?primaryTopic chemspider:smiles ?smiles .
+	?primaryTopic ops:smiles ?smiles .
 }".
