@@ -20,6 +20,10 @@ require_once 'data_handlers/data_handler_factory.class.php';
 require_once 'data_handlers/item_data_handler.class.php';
 require_once 'data_handlers/external_service_data_handler.class.php';
 
+define ('INIT_CACHEABLE', 0);
+define ('NOT_CACHEABLE', 1);
+define ('CACHEABLE', 2);
+
 class LinkedDataApiResponse {
     
     var $statusCode = HTTP_OK;
@@ -29,7 +33,7 @@ class LinkedDataApiResponse {
     var $ParameterPropertyMapper = false;
     var $DataGraph = false;
     var $SparqlEndpoint = false;
-    var $cacheable = false;    
+    var $cacheable = INIT_CACHEABLE;    
     var $pageUri = false;
     var $viewer = false;
     var $errorMessages = array();
@@ -48,7 +52,7 @@ class LinkedDataApiResponse {
         $this->DataGraph = new LinkedDataApiGraph(false, $this->ConfigGraph);
         $this->generatedTime = time();
         $this->lastModified = gmdate("D, d M Y H:i:s") . " GMT";
-        $this->cacheable = false;
+        $this->cacheable = INIT_CACHEABLE;
         $this->outputFormats = $outputFormats;
         if($HttpRequestFactory){
           $this->HttpRequestFactory = $HttpRequestFactory;
@@ -147,7 +151,7 @@ class LinkedDataApiResponse {
         $dataHandlerParams = new DataHandlerParams($this->Request, 
         										$this->ConfigGraph, $this->DataGraph, $viewerUri, 
         										$sparqlWriter, $this->SparqlEndpoint,
-        										$this->endpointUrl);
+        										$this->endpointUrl, $this);
         try{
         	switch($this->ConfigGraph->getEndpointType()){
         		case API.'ListEndpoint' :        			
@@ -626,7 +630,7 @@ class LinkedDataApiResponse {
 	            case PUELIA.'SearchEndpoint':
 	                $pageUri = $this->Request->getUriWithPageParam();
 	                break;
-	            case API.'ItemEndpoint': case API.'ExternalHTTPService':
+	            case API.'ItemEndpoint': case API.'ExternalHTTPService': case API.'LoadEndpoint':
 	                $pageUri = $this->Request->getUri();
 	                break;
 	            default:
@@ -682,7 +686,10 @@ class LinkedDataApiResponse {
 	        header("ETag: {$this->eTag}");
 	        $this->body = $page;
 	        echo $page;
-	        $this->cacheable = true;
+	        if ($this->cacheable!=NOT_CACHEABLE){
+	            $this->cacheable=CACHEABLE;
+	        }
+	        
 	    } catch (Exception $e){
 	        $this->setStatusCode(HTTP_Internal_Server_Error);
 	        $this->errorMessages[]="Sorry, Puelia experienced an error trying to serve this page.";
@@ -708,6 +715,8 @@ class LinkedDataApiResponse {
 	            break;
 	    
 	    }
+	    
+	    $this->cacheable=NOT_CACHEABLE;
 	}
     
     function getDataGraph(){

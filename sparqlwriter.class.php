@@ -809,8 +809,8 @@ _SPARQL_;
      * @param string $graphName
      * @return string
      */
-    function getInsertQueryForExternalServiceData($rdfData, $graphName){
-        $query = "INSERT IN GRAPH <{$graphName}>{".$rdfData."}";
+    function getInsertQueryForGraph($rdfData, $graphName, $prefixes=''){
+        $query = $prefixes."INSERT IN GRAPH <{$graphName}> {".$rdfData."\n}";
     
         return $query;
     }

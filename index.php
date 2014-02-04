@@ -132,7 +132,7 @@ else
 $Response->serve();
 if (defined("PUELIA_SERVE_FROM_CACHE") AND  PUELIA_SERVE_FROM_CACHE
         AND !$Request->hasNoCacheHeader() 
-        AND $Response->cacheable)
+        AND $Response->cacheable==CACHEABLE)
 {
 	LinkedDataApiCache::cacheResponse($Request, $Response);
 }

@@ -1,5 +1,7 @@
 <?php
 
+require_once 'lda.inc.php';
+
 class Response304
 {
 	var $response;
@@ -7,7 +9,7 @@ class Response304
 	public function __construct($response)
 	{
 		$this->response = $response; 
-		$this->cacheable = false;
+		$this->cacheable = NOT_CACHEABLE;
 	}
 	
 	public function serve()

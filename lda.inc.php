@@ -34,9 +34,24 @@ define('SKOS', 'http://www.w3.org/2004/02/skos/core#');
 define('XHTML', 'http://www.w3.org/1999/xhtml#');
 define('OPEN', 'http://open.vocab.org/terms/');
 
+define('OPS_API', 'http://www.openphacts.org/api');
+
+define('LOADING_QUEUED', OPS_API.'/QUEUED');
+define('LOADING_IN_PROGRESS', OPS_API.'/LOADING');
+define('LOADING_FINISHED', OPS_API.'/LOADED');
+
+define('LOADING_STATUS_PREDICATE', OPS_API.'#loadingStatus');
+define('LOADING_GRAPH_PREDICATE', OPS_API.'#graphName');
+
+define ('INIT_CACHEABLE', 0);
+define ('NOT_CACHEABLE', 1);
+define ('CACHEABLE', 2);
+
+define('DATASET_DESCRIPTORS_GRAPH', OPS_API.'/datasetDescriptorsTest');//TODO change back
+
 define('PUELIA_LOG_DIR', dirname(__FILE__).'/logs/');
 
-define('OPS_API', 'http://www.openphacts.org/api');
+
 
 require_once('lib/log4php/src/main/php/Logger.php');
 

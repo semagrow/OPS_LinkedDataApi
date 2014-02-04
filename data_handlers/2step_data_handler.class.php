@@ -1,11 +1,11 @@
 <?php
 
 require_once 'lda.inc.php';
-require_once 'data_handlers/data_handler.interf.php';
+require_once 'data_handlers/data_handler_adapter.class.php';
 require_once 'data_handler_components/selector.interf.php';
 require_once 'data_handler_components/viewer.interf.php';
 
-class TwoStepDataHandler implements DataHandlerInterface{
+class TwoStepDataHandler extends DataHandlerAdapter{
 	
 	protected $selector;
 	protected $viewer;

@@ -1,8 +1,8 @@
 <?php
 
-require_once 'data_handlers/data_handler.interf.php';
+require_once 'data_handlers/data_handler_adapter.class.php';
 
-abstract class OneStepDataHandler implements DataHandlerInterface {
+abstract class OneStepDataHandler extends DataHandlerAdapter {
     
     protected $Request = false;
     protected $ConfigGraph = false;

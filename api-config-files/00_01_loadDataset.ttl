@@ -31,12 +31,12 @@
 		api:name "Load Dataset" ;
 		api:description "Load a new dataset based on the input VOID header";
 		api:uriTemplate "/load?uri={uri}&graph={graph}" ;
-		api:exampleRequestPath "/load?uri=https%3A%2F%2Fgithub.com%2Fopenphacts%2Fops-platform-setup%2Fblob%2Fmaster%2Fvoid%2Fchembl%2Fchembl16-void.ttl&graph=http%3A%2F%2Fwww.ebi.ac.uk%2Fchembl";
+		api:exampleRequestPath "/load?uri=https%3A%2F%2Fraw.github.com%2Fopenphacts%2Fops-platform-setup%2Fmaster%2Fvoid%2Fchembl%2Fchembl16-void.ttl&graph=http%3A%2F%2Fwww.ebi.ac.uk%2Fchembl";
 		] .
 
 <#uri> api:name "uri" ;
 	api:label "uri";
-	api:value "A VOID URI. e.g.: https://github.com/openphacts/ops-platform-setup/blob/master/void/chembl/chembl16-void.ttl" ;
+	api:value "A VOID URI. e.g.: https://raw.github.com/openphacts/ops-platform-setup/master/void/chembl/chembl16-void.ttl" ;
 	rdfs:range rdfs:Resource .  
 
 <#graph> api:name "graph" ;

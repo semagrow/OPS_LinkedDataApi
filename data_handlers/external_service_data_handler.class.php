@@ -98,7 +98,7 @@ class ExternalServiceDataHandler extends OneStepDataHandler{
 	
 	private function insertRDFDataIntoTripleStore($graphName, $rdfData){
 		//insert new RDF data in the triple store
-		$insertQuery = $this->SparqlWriter->getInsertQueryForExternalServiceData($rdfData, $graphName);
+		$insertQuery = $this->SparqlWriter->getInsertQueryForGraph($rdfData, $graphName);
 	
 		$response = $this->SparqlEndpoint->insert($insertQuery, PUELIA_SPARQL_ACCEPT_MIMES);
 		if(!$response->is_success()){
