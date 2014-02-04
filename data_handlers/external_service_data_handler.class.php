@@ -13,7 +13,7 @@ class ExternalServiceDataHandler extends OneStepDataHandler{
 		parent::__construct($dataHandlerParams);
 	}
 	
-	function loadData(){
+	function processData(){
 		$uriWithoutExtension = $this->Request->getOrderedUriWithoutExtensionAndReservedParams();
 		logDebug("Generating graph name from: {$uriWithoutExtension}");
 		$graphName = OPS_API.'/'.hash("crc32", $uriWithoutExtension);

@@ -165,6 +165,9 @@ class LinkedDataApiResponse {
         		case API.'BatchEndpoint' :
         			$this->dataHandler = DataHandlerFactory::createBatchDataHandler($dataHandlerParams);
         			break;
+        		case API.'LoadEndpoint' :
+        		    $this->dataHandler = DataHandlerFactory::createLoadDataHandler($dataHandlerParams);
+        		    break;
         		default:{
         			$this->setStatusCode(HTTP_Internal_Server_Error);
         			logError("Unsupported Endpoint Type");
@@ -175,7 +178,7 @@ class LinkedDataApiResponse {
         		}
         	}
         	
-        	$this->dataHandler->loadData();
+        	$this->dataHandler->processData();
         	$this->pageUri = $this->dataHandler->getPageUri();
         }
         catch(EmptyResponseException $e){

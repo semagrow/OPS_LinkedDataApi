@@ -12,7 +12,7 @@ class ItemDataHandler extends OneStepDataHandler{
         parent::__construct($dataHandlerParams);
     }
     
-    function loadData(){
+    function processData(){
         $uri = $this->ConfigGraph->getCompletedItemTemplate();
         $this->list_of_item_uris = array($uri);
         

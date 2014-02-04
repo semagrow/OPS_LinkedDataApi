@@ -3,7 +3,7 @@
 
 interface DataHandlerInterface {
 	
-	function loadData();
+	function processData();
 	
 }
 

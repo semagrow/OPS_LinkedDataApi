@@ -16,7 +16,7 @@ class TwoStepDataHandler implements DataHandlerInterface{
 		$this->viewer = $viewer;
 	}
 	
-	function loadData(){	
+	function processData(){	
 		$this->list_of_item_uris = $this->selector->getItemMap();
 		if (isset($this->list_of_item_uris['item']) && count($this->list_of_item_uris['item']) == 0){
 			throw new EmptyResponseException("Empty list returned from selector");
