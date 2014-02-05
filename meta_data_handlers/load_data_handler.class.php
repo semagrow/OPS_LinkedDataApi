@@ -51,7 +51,7 @@ class LoadDataHandler extends DataHandlerAdapter{
         //call sparqlWriter function to generate the INSERT query in Virtuoso
         $insertQuery = $this->SparqlWriter->getInsertQueryForGraph($remainingData, DATASET_DESCRIPTORS_GRAPH, $prefixes);
               
-        $response = $this->SparqlEndpoint->query($insertQuery);
+        $response = $this->SparqlEndpoint->insert($insertQuery);
         if(!$response->is_success()){
             logError("Endpoint returned {$response->status_code} {$response->body} Insert Query <<<{$insertQuery}>>> failed against {$this->SparqlEndpoint->uri}");
             throw new ErrorException("Insertion of VOID header in data-store: ".$insertQuery." failed");

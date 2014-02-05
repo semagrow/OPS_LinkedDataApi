@@ -14,6 +14,9 @@ class SparqlServiceBase {
    * @access private
    */
   var $request_factory;
+  
+  var $no_cache_request_factory;
+  
   /**
    * @access private
    */
@@ -28,6 +31,8 @@ class SparqlServiceBase {
     $this->uri = $uri;
     $this->credentials = $credentials;
     $this->request_factory = $request_factory;
+    $this->no_cache_request_factory = new HttpRequestFactory();
+    $this->no_cache_request_factory->read_from_cache(FALSE);
   }
 
   /**
@@ -148,11 +153,7 @@ class SparqlServiceBase {
    return $request->execute();
   }
   
-  function insert($insertQuery, $mime=''){
-      if (empty( $this->request_factory) ) {
-          $this->request_factory = new HttpRequestFactory();
-      }
-      
+  function insert($insertQuery, $mime=''){      
       if ( empty($mime) ) {
           $output = '';
           $accept = '*/*';
@@ -166,7 +167,7 @@ class SparqlServiceBase {
           $accept = $mime;
       }
       
-      $request = $this->request_factory->make( 'POST', $this->uri, $this->credentials );
+      $request = $this->no_cache_request_factory->make( 'POST', $this->uri, $this->credentials );
       $request->set_body( $this->get_query_params($insertQuery, $output) );
       $request->set_accept($accept);
       $request->set_content_type(MIME_FORMENCODED);

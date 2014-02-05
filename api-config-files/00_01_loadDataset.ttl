@@ -20,7 +20,7 @@
 
 <#compound> a api:API ;
         rdfs:label "Load Dataset"@en ;
-        api:sparqlEndpoint <http://localhost:8890/sparql/> ;
+        api:sparqlEndpoint <http://ops2.few.vu.nl:8890/sparql/> ;
         api:contentNegotiation api:parameterBased ;
         api:variable <#uri> ;
         api:variable <#graph> ;  

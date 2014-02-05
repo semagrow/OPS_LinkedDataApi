@@ -20,10 +20,6 @@ require_once 'data_handlers/data_handler_factory.class.php';
 require_once 'data_handlers/item_data_handler.class.php';
 require_once 'data_handlers/external_service_data_handler.class.php';
 
-define ('INIT_CACHEABLE', 0);
-define ('NOT_CACHEABLE', 1);
-define ('CACHEABLE', 2);
-
 class LinkedDataApiResponse {
     
     var $statusCode = HTTP_OK;
@@ -144,8 +140,6 @@ class LinkedDataApiResponse {
           $credentials = false;
         }
         
-        //$noCacheRequestFactory = new HttpRequestFactory();
-        //$noCacheRequestFactory->read_from_cache(FALSE);
         $this->SparqlEndpoint = new SparqlService($sparqlEndpointUri, $credentials, $this->HttpRequestFactory);
         
         $dataHandlerParams = new DataHandlerParams($this->Request, 
