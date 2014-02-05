@@ -810,7 +810,7 @@ _SPARQL_;
      * @return string
      */
     function getInsertQueryForGraph($rdfData, $graphName, $prefixes=''){
-        $query = $prefixes."INSERT IN GRAPH <{$graphName}> {".$rdfData."\n}";
+        $query = $prefixes."\nINSERT IN GRAPH <{$graphName}> {".$rdfData."\n}";
     
         return $query;
     }
