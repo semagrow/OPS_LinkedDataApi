@@ -57,6 +57,7 @@ class LoadDataHandler extends DataHandlerAdapter{
             throw new ErrorException("Insertion of VOID header in data-store: ".$insertQuery." failed");
         }
         else{
+            logDebug("Insert query: ".$insertQuery);
             logDebug("Inserted in graph: ".DATASET_DESCRIPTORS_GRAPH." for the request ".$this->Request->getUri());
         }
         
