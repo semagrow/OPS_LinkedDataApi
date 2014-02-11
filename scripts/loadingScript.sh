@@ -23,7 +23,7 @@ function handleError {
 	success=false
 }
 
-
+#adding the data directory to Virtuoso.ini file ; assume path is in DATA_DIR env variable
 
 SERVER_NAME="localhost"
 metaGraphName="http://www.openphacts.org/api/datasetDescriptorsTest"
@@ -39,6 +39,7 @@ curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\
 echo "Executing checkpoint before it all starts .." 
 ./executeCheckpoint.sh
 
+workDir=$(pwd)
 
 cat datasetList | while read datasetDescriptionURI
 do
@@ -65,6 +66,7 @@ UNION
 
 	encodedQuery=$(php -r "echo urlencode(\"${dataDumpsQuery}\");")
 	curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2 >dumpList
+	dumpListPath="$(pwd)/dumpList"
 
 	#update loading status in the meta-graph
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
@@ -83,12 +85,14 @@ INSERT IN GRAPH <$metaGraphName> {
 } }"
 	encodedQuery=$(php -r "echo urlencode(\"${getGraphQuery}\");")
 	graphName=$(curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2)
-	directoryName=$(echo "$graphName" | sed "s,.*://,," | tr '/' '_') #remove prefix (e.g. http://) and replace '/' with '_' in the rest of the file
-	mkdir "$directoryName"
-	cd "$directoryName"
+	dirName=$(echo "$graphName" | sed "s,.*://,," | tr '/' '_') #remove prefix (e.g. http://) and replace '/' with '_' in the rest of the file
+	directoryPath="$DATA_DIR/$dirName"
+	sudo rm -rf "$directoryPath"
+	mkdir -p "$directoryPath"
+	cd "$directoryPath"
 
 	#download the data dumps
-	echo "Downloading data dumps in $directoryName .."
+	echo "Downloading data dumps in $directoryPath .."
 	success=true
 	while read dumpURI
 	do
@@ -96,18 +100,18 @@ INSERT IN GRAPH <$metaGraphName> {
 		if [ $? -ne 0 ]; then
 			message="Could not download $dumpURI . Aborting the LOAD for $datasetDescriptionURI . Please fix the VOID header at this location!"
 			handleError "$message"
-			break;	
+			break;
 		fi
 
 
-	done <../dumpList 
+	done <"$dumpListPath"
 
 	if [ $success == false ] ; then
 		echo "Skipping to next dataset"
 		continue
 	fi
 
-	#check if we need to un-archive the data dump		
+	#check if we need to un-archive the data dump
 	echo "Unarchiving data dumps .."
 	find *.tar.gz -exec tar xvzf {} \; -exec rm {} \;
 	find *.gz -exec gzip -d -v {} \;
@@ -117,26 +121,24 @@ INSERT IN GRAPH <$metaGraphName> {
 
 	#load into Virtuoso using ISQL
 	echo "Loading data to Virtuoso .."
-	cd ..
-	sudo chown -R vagrant:vagrant $directoryName
-	fullPath=$(echo "$(pwd)/$directoryName")
-	./executeLoadDir.sh "$fullPath" "*" "$graphName"
+	cd "$workDir"
+	sudo chown -R vagrant:vagrant $directoryPath
+	./executeLoadDir.sh "$directoryPath" "*" "$graphName"
 	if [ $? -ne 0 ]; then
 		message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
-		handleError "$message"	
+		handleError "$message"
 		continue
 	fi
 	./executeLoaderRun.sh
 	if [ $? -ne 0 ]; then
 		message="Could not call the rdf_loader_run command in Virtuoso. Possible problems with Virtuoso."
 		handleError "$message"
-		continue
 	fi
 
 	#if successful, update loading status in the meta-graph
 	if $success ; then
 		echo "Successfully loaded $datasetDescriptionURI"
-		#TODO checkpoint Virtuoso
+		./executeCheckpoint.sh
 
 		updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 			<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
@@ -147,12 +149,17 @@ INSERT IN GRAPH <$metaGraphName> {
 		}"
 		encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
-	#TODO else revert to previous checkpoint
+	else
+		echo "$datasetDescriptionURI could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
+		./executeRawExit.sh
+		sudo rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
+		sudo virtuoso-t -f &
+		sleep 60
 	fi
 
 done
 
-./executeCheckpoint.sh
+
 
 
 
