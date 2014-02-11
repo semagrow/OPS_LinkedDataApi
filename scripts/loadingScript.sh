@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#set -x
+#trap read debug
+
 function handleError {
 	echo "$1"
 
@@ -7,15 +10,15 @@ function handleError {
 
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o1 .
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
+		OPTIONAL {<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .}
 	}}
 
 	INSERT IN GRAPH <$metaGraphName> {
 		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> \"$1\"
+	        <$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> \\\""${1}"\\\"
 	}"
 	encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
-	curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
+	curl "http://$SERVER_NAME:8890/sparql?query=${encodedQuery}"
 
 	success=false
 }
@@ -81,18 +84,17 @@ INSERT IN GRAPH <$metaGraphName> {
 	encodedQuery=$(php -r "echo urlencode(\"${getGraphQuery}\");")
 	graphName=$(curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2)
 	directoryName=$(echo "$graphName" | sed "s,.*://,," | tr '/' '_') #remove prefix (e.g. http://) and replace '/' with '_' in the rest of the file
-	echo "$directoryName"
 	mkdir "$directoryName"
 	cd "$directoryName"
 
 	#download the data dumps
-	echo "Downloading data dumps .."
+	echo "Downloading data dumps in $directoryName .."
 	success=true
 	while read dumpURI
 	do
-		#wget "$dumpURI"
+		wget "$dumpURI"
 		if [ $? -ne 0 ]; then
-			$message="Could not download $dumpURI . Aborting the LOAD for $datasetDescriptionURI . Please fix the VOID header at this location!"
+			message="Could not download $dumpURI . Aborting the LOAD for $datasetDescriptionURI . Please fix the VOID header at this location!"
 			handleError "$message"
 			break;	
 		fi
@@ -100,7 +102,8 @@ INSERT IN GRAPH <$metaGraphName> {
 
 	done <../dumpList 
 
-	if !$success ; then
+	if [ $success == false ] ; then
+		echo "Skipping to next dataset"
 		continue
 	fi
 
@@ -119,13 +122,13 @@ INSERT IN GRAPH <$metaGraphName> {
 	fullPath=$(echo "$(pwd)/$directoryName")
 	./executeLoadDir.sh "$fullPath" "*" "$graphName"
 	if [ $? -ne 0 ]; then
-		$message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
+		message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
 		handleError "$message"	
 		continue
 	fi
 	./executeLoaderRun.sh
 	if [ $? -ne 0 ]; then
-		$message="Could not call the rdf_loader_run command in Virtuoso. Possible problems with Virtuoso."
+		message="Could not call the rdf_loader_run command in Virtuoso. Possible problems with Virtuoso."
 		handleError "$message"
 		continue
 	fi
