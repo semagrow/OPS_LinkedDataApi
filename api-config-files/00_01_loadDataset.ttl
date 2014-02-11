@@ -20,7 +20,7 @@
 
 <#compound> a api:API ;
         rdfs:label "Load Dataset"@en ;
-        api:sparqlEndpoint <http://localhost:4502/sparql/> ;
+        api:sparqlEndpoint <http://localhost:8890/sparql/> ;
         api:contentNegotiation api:parameterBased ;
         api:variable <#uri> ;
         api:variable <#graph> ;  
@@ -32,7 +32,7 @@
 		api:description "Load a new dataset based on the input VOID header";
 		api:uriTemplate "/load?uri={uri}&graph={graph}" ;
 		api:exampleRequestPath "/load?uri=https%3A%2F%2Fraw.github.com%2Fopenphacts%2Fops-platform-setup%2Fmaster%2Fvoid%2Fchembl%2Fchembl16-void.ttl&graph=http%3A%2F%2Fwww.ebi.ac.uk%2Fchembl";
-		api:exampleRequestPath "/load?uri=https%3A%2F%2Fraw.github.com%2Fopenphacts%2Fops-platform-setup%2Fmaster%2Fvoid%2Fdrugbank_void.ttl&graph=http%3A%2F%2Flinkedlifedata.com%2Fresource%2Fdrugbank";
+		api:exampleRequestPath "/load?uri=https%3A%2F%2Fraw.github.com%2Fopenphacts%2Fops-platform-setup%2FseverVOIDs%2Fvoid%2Fchebi%2FchebiVoid100.ttl&graph=http%3A%2F%2Fwww.ebi.ac.uk%2Fchebi";
 		] .
 
 <#uri> api:name "uri" ;
