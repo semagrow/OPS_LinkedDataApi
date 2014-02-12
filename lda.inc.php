@@ -40,6 +40,7 @@ define('LOADING_QUEUED', OPS_API.'/QUEUED');
 define('LOADING_IN_PROGRESS', OPS_API.'/LOADING');
 define('LOADING_FINISHED', OPS_API.'/LOADED');
 
+define('OPS_RESULT_PREDICATE', OPS_API.'#result');
 define('LOADING_STATUS_PREDICATE', OPS_API.'#loadingStatus');
 define('LOADING_GRAPH_PREDICATE', OPS_API.'#graphName');
 

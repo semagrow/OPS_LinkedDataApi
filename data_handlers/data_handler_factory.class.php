@@ -4,6 +4,7 @@ require_once 'data_handlers/2step_data_handler.class.php';
 require_once 'data_handlers/item_data_handler.class.php';
 require_once 'data_handlers/external_service_data_handler.class.php';
 require_once 'meta_data_handlers/load_data_handler.class.php';
+require_once 'meta_data_handlers/trigger_load_data_handler.class.php';
 require_once 'data_handler_components/sparql_selector.class.php';
 require_once 'data_handler_components/request_selector.class.php';
 require_once 'data_handler_components/single_expansion_viewer.class.php';
@@ -43,6 +44,10 @@ class DataHandlerFactory{
 	
 	public static function createLoadDataHandler($dataHandlerParams){
 	    return new LoadDataHandler($dataHandlerParams);
+	}
+	
+	public static function createTriggerLoadEndpoint($dataHandlerParams){
+	    return new TriggerLoadDataHandler($dataHandlerParams);
 	}
 	
 }

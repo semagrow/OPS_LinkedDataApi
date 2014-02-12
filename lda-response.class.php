@@ -166,6 +166,9 @@ class LinkedDataApiResponse {
         		case API.'LoadEndpoint' :
         		    $this->dataHandler = DataHandlerFactory::createLoadDataHandler($dataHandlerParams);
         		    break;
+        		case API.'TriggerLoadEndpoint' :
+        		    $this->dataHandler = DataHandlerFactory::createTriggerLoadEndpoint($dataHandlerParams);
+        		    break;
         		default:{
         			$this->setStatusCode(HTTP_Internal_Server_Error);
         			logError("Unsupported Endpoint Type");
@@ -624,7 +627,7 @@ class LinkedDataApiResponse {
 	            case PUELIA.'SearchEndpoint':
 	                $pageUri = $this->Request->getUriWithPageParam();
 	                break;
-	            case API.'ItemEndpoint': case API.'ExternalHTTPService': case API.'LoadEndpoint':
+	            case API.'ItemEndpoint': case API.'ExternalHTTPService': case API.'LoadEndpoint': case API.'TriggerLoadEndpoint':
 	                $pageUri = $this->Request->getUri();
 	                break;
 	            default:
