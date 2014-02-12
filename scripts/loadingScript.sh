@@ -30,7 +30,9 @@ metaGraphName="http://www.openphacts.org/api/datasetDescriptorsTest"
 
 #get the list of datasets to be loaded
 URIsToUpdate="SELECT ?description WHERE { GRAPH <$metaGraphName> {
-?description <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .
+{?description <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .}
+UNION
+{?description <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .}
 } } ";
 encodedQuery=$(php -r "echo urlencode(\"${URIsToUpdate}\");")
 curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2 >datasetList
@@ -48,7 +50,6 @@ do
 	#get the links to dataset dumps
 	dataDumpsQuery="SELECT ?dataDump WHERE { GRAPH <$metaGraphName> {
 
-<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .
 <$datasetDescriptionURI> foaf:primaryTopic ?dataset .
 
 { ?dataset a void:Dataset .
@@ -63,7 +64,6 @@ UNION
 ?subset void:dataDump ?dataDump . }
 
 } }"
-
 	encodedQuery=$(php -r "echo urlencode(\"${dataDumpsQuery}\");")
 	curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2 >dumpList
 	dumpListPath="$(pwd)/dumpList"
@@ -132,7 +132,7 @@ INSERT IN GRAPH <$metaGraphName> {
 	./executeLoaderRun.sh
 	if [ $? -ne 0 ]; then
 		message="Could not call the rdf_loader_run command in Virtuoso. Possible problems with Virtuoso."
-		handleError "$message"
+		success=false
 	fi
 
 	#if successful, update loading status in the meta-graph
@@ -153,8 +153,10 @@ INSERT IN GRAPH <$metaGraphName> {
 		echo "$datasetDescriptionURI could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
 		./executeRawExit.sh
 		sudo rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
-		sudo virtuoso-t -f &
+		sudo virtuoso-t +wait +configfile $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.ini
+		./grantPermissions.sh
 		sleep 60
+		handleError "$message"
 	fi
 
 done
