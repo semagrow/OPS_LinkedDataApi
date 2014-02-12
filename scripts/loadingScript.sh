@@ -10,7 +10,7 @@ function handleError {
 
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o1 .
-		OPTIONAL {<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .}
+		<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
 	}}
 
 	INSERT IN GRAPH <$metaGraphName> {
@@ -71,6 +71,7 @@ UNION
 	#update loading status in the meta-graph
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 <$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
+<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
 }}
 
 INSERT IN GRAPH <$metaGraphName> {
@@ -149,7 +150,7 @@ INSERT IN GRAPH <$metaGraphName> {
 		}"
 		encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
-	else
+	else #restart Virtuoso and revert to the previous checkpoint
 		echo "$datasetDescriptionURI could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
 		./executeRawExit.sh
 		sudo rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
