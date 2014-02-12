@@ -1,0 +1,36 @@
+@base <http://www.openphacts.org/api> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix api: <http://purl.org/linked-data/api/vocab#> .
+@prefix rel: <http://vocab.org/relationship/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix drugbank: <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/> .
+@prefix sio: <http://semanticscience.org/resource/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix cheminf: <http://semanticscience.org/resource/> .
+@prefix qudt: <http://qudt.org/1.1/schema/qudt#> .
+@prefix ops: <http://www.openphacts.org/api#> .
+@prefix cito: <http://purl.org/spar/cito/> .
+@prefix aers: <http://aers.data2semantics.org/vocab/> .
+
+<#compound> a api:API ;
+        rdfs:label "Load Dataset"@en ;
+        api:sparqlEndpoint <http://localhost:8890/sparql/> ;
+        api:contentNegotiation api:parameterBased ;
+        api:variable <#uri> ;
+        api:variable <#graph> ;  
+	api:vocabulary <http://rdfs.org/ns/void#> ;
+	api:description "An API configuration to load data in the OpenPhacts System" ;
+	api:endpoint [ 
+		a api:TriggerLoadEndpoint ;
+		api:name "Trigger Loading" ;
+		api:description "Load a new dataset based on the input VOID header";
+		api:uriTemplate "/triggerLoading" ;
+		api:exampleRequestPath "/triggerLoading";
+		] .
+
