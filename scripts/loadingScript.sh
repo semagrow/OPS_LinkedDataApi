@@ -25,6 +25,7 @@ function handleError {
 
 #adding the data directory to Virtuoso.ini file ; assume path is in DATA_DIR env variable
 
+SCRIPTS_PATH="/var/www/html/scripts"
 SERVER_NAME="localhost"
 metaGraphName="http://www.openphacts.org/api/datasetDescriptorsTest"
 
@@ -39,7 +40,7 @@ curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\
 
 #checkpoint Virtuoso here before the whole process starts
 echo "Executing checkpoint before it all starts .." 
-./executeCheckpoint.sh
+$SCRIPTS_PATH/executeCheckpoint.sh
 
 workDir=$(pwd)
 
@@ -124,13 +125,13 @@ INSERT IN GRAPH <$metaGraphName> {
 	echo "Loading data to Virtuoso .."
 	cd "$workDir"
 	sudo chown -R vagrant:vagrant $directoryPath
-	./executeLoadDir.sh "$directoryPath" "*" "$graphName"
+	$SCRIPTS_PATH/executeLoadDir.sh "$directoryPath" "*" "$graphName"
 	if [ $? -ne 0 ]; then
 		message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
 		handleError "$message"
 		continue
 	fi
-	./executeLoaderRun.sh
+	$SCRIPTS_PATH/executeLoaderRun.sh
 	if [ $? -ne 0 ]; then
 		message="Could not call the rdf_loader_run command in Virtuoso. Possible problems with Virtuoso."
 		success=false
@@ -139,7 +140,7 @@ INSERT IN GRAPH <$metaGraphName> {
 	#if successful, update loading status in the meta-graph
 	if $success ; then
 		echo "Successfully loaded $datasetDescriptionURI"
-		./executeCheckpoint.sh
+		$SCRIPTS_PATH/executeCheckpoint.sh
 
 		updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 			<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
@@ -152,10 +153,10 @@ INSERT IN GRAPH <$metaGraphName> {
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 	else #restart Virtuoso and revert to the previous checkpoint
 		echo "$datasetDescriptionURI could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
-		./executeRawExit.sh
+		$SCRIPTS_PATH/executeRawExit.sh
 		sudo rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
 		sudo virtuoso-t +wait +configfile $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.ini
-		./grantPermissions.sh
+		$SCRIPTS_PATH/grantPermissions.sh
 		sleep 60
 		handleError "$message"
 	fi
