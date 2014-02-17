@@ -15,15 +15,20 @@ class TriggerLoadDataHandler extends DataHandlerAdapter{
         $this->Response = $dataHandlerParams->Response;
     } 
     
-    function processData(){    
-        //shell_exec('nohup /var/www/html/scripts/loadingScript.sh &>/dev/null');
-	$cmd = "/var/www/html/scripts/loadingScript.sh &> /dev/null &";
-	exec('/bin/bash -c "' . addslashes($cmd) . '"');
-
-        
+    function processData(){
         $this->pageUri = $this->Request->getUriWithoutPageParam();
-        $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading triggered successfully. Use /loadingStatus for progress info.");
         
+        $loadingDatasetsCount = shell_exec('/var/www/html/scripts/getLoadingDatasetCount.sh 2>/dev/null');
+        if ($loadingDatasetsCount > 0){
+            $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading not triggered. Other datasets are already loading. Try again later.");
+        }
+        else{
+            $cmd = "/var/www/html/scripts/loadingScript.sh &> /dev/null &";
+            exec('/bin/bash -c "' . addslashes($cmd) . '"');
+
+            $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading triggered successfully. Use /loadingStatus for progress info.");
+        }
+
         $this->Response->cacheable = NOT_CACHEABLE;
     }
     
