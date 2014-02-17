@@ -3,6 +3,8 @@
 #set -x
 #trap read debug
 
+source /vagrant/env.sh
+
 function handleError {
 	echo "$1"
 
@@ -72,7 +74,6 @@ UNION
 	#update loading status in the meta-graph
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 <$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
-<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
 }}
 
 INSERT IN GRAPH <$metaGraphName> {
@@ -89,7 +90,7 @@ INSERT IN GRAPH <$metaGraphName> {
 	graphName=$(curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2)
 	dirName=$(echo "$graphName" | sed "s,.*://,," | tr '/' '_') #remove prefix (e.g. http://) and replace '/' with '_' in the rest of the file
 	directoryPath="$DATA_DIR/$dirName"
-	sudo rm -rf "$directoryPath"
+	rm -rf "$directoryPath"
 	mkdir -p "$directoryPath"
 	cd "$directoryPath"
 
@@ -124,7 +125,7 @@ INSERT IN GRAPH <$metaGraphName> {
 	#load into Virtuoso using ISQL
 	echo "Loading data to Virtuoso .."
 	cd "$workDir"
-	sudo chown -R vagrant:vagrant $directoryPath
+	chown -R www-data:vagrant $directoryPath
 	$SCRIPTS_PATH/executeLoadDir.sh "$directoryPath" "*" "$graphName"
 	if [ $? -ne 0 ]; then
 		message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
@@ -154,8 +155,8 @@ INSERT IN GRAPH <$metaGraphName> {
 	else #restart Virtuoso and revert to the previous checkpoint
 		echo "$datasetDescriptionURI could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
 		$SCRIPTS_PATH/executeRawExit.sh
-		sudo rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
-		sudo virtuoso-t +wait +configfile $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.ini
+		rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
+		virtuoso-t +wait +configfile $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.ini
 		$SCRIPTS_PATH/grantPermissions.sh
 		sleep 60
 		handleError "$message"

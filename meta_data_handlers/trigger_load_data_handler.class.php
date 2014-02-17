@@ -16,7 +16,10 @@ class TriggerLoadDataHandler extends DataHandlerAdapter{
     } 
     
     function processData(){    
-        shell_exec('/var/www/html/scripts/loadingScript.sh 2>/dev/null &');
+        //shell_exec('nohup /var/www/html/scripts/loadingScript.sh &>/dev/null');
+	$cmd = "/var/www/html/scripts/loadingScript.sh &> /dev/null &";
+	exec('/bin/bash -c "' . addslashes($cmd) . '"');
+
         
         $this->pageUri = $this->Request->getUriWithoutPageParam();
         $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading triggered successfully. Use /loadingStatus for progress info.");
