@@ -11,8 +11,11 @@ function handleError {
 	#revert the loading status in the meta-graph to QUEUED
 
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o1 .
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
+		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o1 .	
+	}}
+
+	DELETE WHERE { GRAPH <$metaGraphName> {
+		<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .	
 	}}
 
 	INSERT IN GRAPH <$metaGraphName> {
@@ -25,11 +28,12 @@ function handleError {
 	success=false
 }
 
-#adding the data directory to Virtuoso.ini file ; assume path is in DATA_DIR env variable
+#assume path is in DATA_DIR env variable
 
 SCRIPTS_PATH="/var/www/html/scripts"
 SERVER_NAME="localhost"
 metaGraphName="http://www.openphacts.org/api/datasetDescriptorsTest"
+
 
 #get the list of datasets to be loaded
 URIsToUpdate="SELECT ?description WHERE { GRAPH <$metaGraphName> {
@@ -74,6 +78,10 @@ UNION
 	#update loading status in the meta-graph
 	updateStatusTemplate="DELETE WHERE { GRAPH <$metaGraphName> {
 <$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
+}}
+
+DELETE WHERE { GRAPH <$metaGraphName> {
+<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .	
 }}
 
 INSERT IN GRAPH <$metaGraphName> {
