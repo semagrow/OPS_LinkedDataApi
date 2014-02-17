@@ -1,0 +1,39 @@
+@base <http://www.openphacts.org/api> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix api: <http://purl.org/linked-data/api/vocab#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix ops: <http://www.openphacts.org/api#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+
+<#dataSources> a api:API ;
+        rdfs:label "Load Dataset"@en ;
+        api:sparqlEndpoint <http://localhost:8890/sparql/> ;
+        api:contentNegotiation api:parameterBased ;
+	api:vocabulary <http://rdfs.org/ns/void#> ;
+	api:description "An API configuration to return information about the loaded data sources" ;
+	api:endpoint [ 
+		a api:ItemEndpoint ;
+		api:name "Get Loading Status" ;
+		api:itemTemplate "http://www.openphacts.org/linked_data_cache" ;
+		api:description "Get loading status" ;
+		api:uriTemplate "/loadingStatus" ;
+		api:exampleRequestPath "/loadingStatus";
+		api:viewer <#loadingStatusViewer> ;
+		api:defaultViewer <#loadingStatusViewer> ] .
+
+<#loadingStatusViewer> a api:Viewer ;
+	api:name "loadingStatusViewer" ;
+	api:template 
+"<http://www.openphacts.org/linked_data_cache> ops:hasDatasetDescriptor ?description .
+?description ops:loadingStatus ?status ;
+	ops:errorMessage ?message . ";
+	api:where
+"GRAPH <http://www.openphacts.org/api/datasetDescriptors> { 
+?description ops:loadingStatus ?status .
+OPTIONAL{ ?description ops:errorMessage ?message .}
+}" .

@@ -166,7 +166,6 @@ INSERT IN GRAPH <$metaGraphName> {
 		rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
 		virtuoso-t +wait +configfile $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.ini
 		$SCRIPTS_PATH/grantPermissions.sh
-		sleep 60
 		handleError "$message"
 	fi
 
