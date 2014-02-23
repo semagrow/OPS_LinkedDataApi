@@ -140,7 +140,16 @@ class LinkedDataApiResponse {
           $credentials = false;
         }
         
-        $this->SparqlEndpoint = new SparqlService($sparqlEndpointUri, $credentials, $this->HttpRequestFactory);
+        switch ($this->ConfigGraph->getEndpointType()){
+            case API.'LoadEndpoint': case API.'TriggerLoadEndpoint':{
+                $noCacheRequestFactory = new HttpRequestFactory();
+                $noCacheRequestFactory->read_from_cache(FALSE);
+                $this->SparqlEndpoint = new SparqlService($sparqlEndpointUri, $credentials, $noCacheRequestFactory); 
+                break;
+            }
+            default: $this->SparqlEndpoint = new SparqlService($sparqlEndpointUri, $credentials, $this->HttpRequestFactory); break;
+        }
+        
         
         $dataHandlerParams = new DataHandlerParams($this->Request, 
         										$this->ConfigGraph, $this->DataGraph, $viewerUri, 
