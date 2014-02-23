@@ -14,6 +14,8 @@ UNION
 { ?subset a void:Dataset . }
 UNION
 { ?subset a <http://www.openphacts.org/api/LDCLinkset> . }
+UNION
+{ ?subset a void:Linkset . }
 
 ?subset void:dataDump ?dataDump . }
 
@@ -102,7 +104,7 @@ class LoadDataHandler extends DataHandlerAdapter{
             $this->DataGraph->add_resource_triple($this->pageUri, OPS_RESULT_PREDICATE, $dumpArray[$i]);
             $this->DataGraph->add_resource_triple($dumpArray[$i], LOADING_STATUS_PREDICATE, LOADING_QUEUED);
             
-            $metaTriples .= '<'.$dumpArray[$i].'> <'.LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.">\n";
+            $metaTriples .= '<'.$dumpArray[$i].'> <'.LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED."> .\n";
         }
         
         $insertQuery = $this->SparqlWriter->getInsertQueryForGraph($metaTriples, DATASET_DESCRIPTORS_GRAPH, '');
