@@ -14,16 +14,16 @@ function handleError {
 	#update the loading status in the meta-graph to LOADING_ERROR, both at the VOID descriptor and datasets dumps level
 
 	updateStatusTemplate="DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o1 .	
+		<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> ?o1 .	
 	}}
 
 	DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .	
+		<$voidDescriptor> <http://www.openphacts.org/api#errorMessage> ?o2 .	
 	}}
 
 	INSERT IN GRAPH <$META_GRAPH_NAME> {
-		<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .
-	        <$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> \\\""${1}"\\\"
+		<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .
+	        <$voidDescriptor> <http://www.openphacts.org/api#errorMessage> \\\""${1}"\\\"
 	}"
 	encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 	curl "http://$SERVER_NAME:8890/sparql?query=${encodedQuery}"
@@ -50,14 +50,14 @@ $SCRIPTS_PATH/executeCheckpoint.sh
 
 workDir=$(pwd)
 
-cat voidDescriptorsList | while read datasetDescriptionURI
+cat datasetVoidDescriptorsList | while read voidDescriptor
 do
-	echo "Processing $datasetDescriptionURI .."
+	echo "Processing $voidDescriptor .."
 
 	#get the download URIs for dataset dumps
 	dataDumpsQuery="SELECT ?dataDump WHERE { GRAPH <$META_GRAPH_NAME> {
 
-<$datasetDescriptionURI> foaf:primaryTopic ?dataset .
+<$voidDescriptor> foaf:primaryTopic ?dataset .
 
 { ?dataset a void:Dataset .
 ?dataset void:dataDump ?dataDump . }
@@ -68,7 +68,8 @@ UNION
 UNION
 { ?subset a <http://www.openphacts.org/api/LDCLinkset> . }
 
-?subset void:dataDump ?dataDump . }
+?subset void:dataDump ?dataDump . 
+?dataDump <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .
 
 } }"
 	encodedQuery=$(php -r "echo urlencode(\"${dataDumpsQuery}\");")
@@ -77,22 +78,22 @@ UNION
 
 	#update loading status in the meta-graph at the VOID descriptor level
 	updateStatusTemplate="DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
+<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> ?o .
 }}
 
 DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
+<$voidDescriptor> <http://www.openphacts.org/api#errorMessage> ?o2 .
 }}
 
 INSERT IN GRAPH <$META_GRAPH_NAME> {
-<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING_DATASETS> .
+<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> <http://www.openphacts.org/api/LOADING> .
 }"
 	encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 	curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 
 	#get the associated graph name and create a directory where to download the data dumps
 	getGraphQuery="SELECT ?graphName WHERE { GRAPH <$META_GRAPH_NAME> {
-<$datasetDescriptionURI> <http://www.openphacts.org/api#graphName> ?graphName .
+<$voidDescriptor> <http://www.openphacts.org/api#graphName> ?graphName .
 } }"
 	encodedQuery=$(php -r "echo urlencode(\"${getGraphQuery}\");")
 	graphName=$(curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2)
@@ -121,14 +122,14 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 }}
 
 INSERT IN GRAPH <$META_GRAPH_NAME> {
-<$dumpURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING_DATASETS> .
+<$dumpURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING> .
 }"
 		encodedQuery=$(php -r "echo urlencode(\"${updateDataDumpStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 
 		wget "$dumpURI"
 		if [ $? -ne 0 ]; then
-			message="Could not download $dumpURI . Aborting the LOAD for $datasetDescriptionURI . Please fix the VOID header at this location!"
+			message="Could not download $dumpURI . Aborting the LOAD for $voidDescriptor . Please fix the VOID header at this location!"
 			handleError "$message"
 			break;
 		fi
@@ -171,15 +172,15 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 
 	#if successful, update loading status in the meta-graph
 	if $success ; then
-		echo "Successfully loaded $datasetDescriptionURI"
+		echo "Successfully loaded $voidDescriptor"
 		$SCRIPTS_PATH/executeCheckpoint.sh
 
 		updateStatusTemplate="DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-			<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> ?o .
+			<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> ?o .
 		}}
 
 		INSERT IN GRAPH <$META_GRAPH_NAME> {
-			<$datasetDescriptionURI> <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/DATASETS_LOADED> .
+			<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> <http://www.openphacts.org/api/LOADED> .
 		}"
 		encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
@@ -197,7 +198,7 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 			curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 		done <"$dumpListPath"
 	else #restart Virtuoso and revert to the previous checkpoint
-		echo "$datasetDescriptionURI could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
+		echo "$voidDescriptor could not be loaded in Virtuoso. Restarting Virtuoso to revert to the previous checkpoint"
 		$SCRIPTS_PATH/executeRawExit.sh
 		rm $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.trx
 		virtuoso-t +wait +configfile $VIRT_INSTALATION_PATH/var/lib/virtuoso/db/virtuoso.ini

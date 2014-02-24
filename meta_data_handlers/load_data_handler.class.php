@@ -59,9 +59,10 @@ class LoadDataHandler extends DataHandlerAdapter{
         logDebug("VOID content: ".$voidData);
         
         //add metainformation at the VOID descriptor level
-        $loadingStatusMetaTriple = '<'.$voidUrl.'> <'.LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
+        $datasetLoadingStatusMetaTriple = '<'.$voidUrl.'> <'.DATASET_LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
+        $linksetLoadingStatusMetaTriple = '<'.$voidUrl.'> <'.LINKSET_LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
         $loadingGraphMetaTriple = '<'.$voidUrl.'> <'.LOADING_GRAPH_PREDICATE.'> <'.$graphName.'> ';
-        $voidData .= $loadingStatusMetaTriple."\n".$loadingGraphMetaTriple;
+        $voidData .= $datasetLoadingStatusMetaTriple."\n".$linksetLoadingStatusMetaTriple."\n".$loadingGraphMetaTriple;
         
         $dataStartPos=stripos($voidData, "\n<");
         $prefixes = substr($voidData, 0, $dataStartPos);
