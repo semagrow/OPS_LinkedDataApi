@@ -20,7 +20,7 @@ UNION
 ?subset void:dataDump ?dataDump . }
 
 OPTIONAL{ ?dataDump <'.LOADING_STATUS_PREDICATE.'> ?status }
-FILTER(!bound(?status) OR (?status=<'.LOADING_ERROR.'>) OR (?status=<'.LOADING_QUEUED.'>)
+FILTER(!bound(?status) OR (?status=<'.LOADING_ERROR.'>) OR (?status=<'.LOADING_QUEUED.'>))
 } }');
 
 class LoadDataHandler extends DataHandlerAdapter{   

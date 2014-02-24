@@ -40,7 +40,7 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		encodedQuery=$(php -r "echo urlencode(\"${updateDataDumpStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 	done <"$dumpListPath"
-	
+
 	success=false
 }
 
@@ -81,7 +81,7 @@ UNION
 }}
 
 DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .	
+<$datasetDescriptionURI> <http://www.openphacts.org/api#errorMessage> ?o2 .
 }}
 
 INSERT IN GRAPH <$META_GRAPH_NAME> {
@@ -98,8 +98,16 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 	graphName=$(curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2)
 	dirName=$(echo "$graphName" | sed "s,.*://,," | tr '/' '_') #remove prefix (e.g. http://) and replace '/' with '_' in the rest of the file
 	directoryPath="$DATA_DIR/$dirName"
-	rm -rf "$directoryPath"
-	mkdir -p "$directoryPath"
+	#rm -rf "$directoryPath"
+	mkdir "$directoryPath"
+	if [ $? -ne 0 ]; then #check if directory existed
+		#directory existed, means we are dealing with a reload
+		echo "Reload true for $graphName"
+		reload=true
+	else
+		echo "Reload false for $graphName"
+		reload=false
+	fi
 	cd "$directoryPath"
 
 	#download the data dumps
@@ -117,7 +125,7 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 }"
 		encodedQuery=$(php -r "echo urlencode(\"${updateDataDumpStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
-		
+
 		wget "$dumpURI"
 		if [ $? -ne 0 ]; then
 			message="Could not download $dumpURI . Aborting the LOAD for $datasetDescriptionURI . Please fix the VOID header at this location!"
@@ -133,22 +141,28 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 
 	#check if we need to un-archive the data dump
 	echo "Unarchiving data dumps .."
-	find *.tar.gz -exec tar xvzf {} \; -exec rm {} \;
-	find *.gz -exec gzip -d -v {} \;
-	find *.tar -exec tar xfv {} \; -exec rm {} \;
-	find *.zip -exec unzip {} \; -exec rm {} \;
-	find *.bz2 -exec bunzip2 {} \;
+	find *.tar.gz -exec tar xvzf --overwrite {} \; -exec rm {} \;
+	find *.gz -exec gzip -d -f -v {} \;
+	find *.tar -exec tar xfv --overwrite {} \; -exec rm {} \;
+	find *.zip -exec unzip -u {} \; -exec rm {} \;
+	find *.bz2 -exec bunzip2 -f {} \;
 
 	#load into Virtuoso using ISQL
 	echo "Loading data to Virtuoso .."
 	cd "$workDir"
-	chown -R www-data:vagrant $directoryPath
-	$SCRIPTS_PATH/executeLoadDir.sh "$directoryPath" "*" "$graphName"
-	if [ $? -ne 0 ]; then
-		message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
-		handleError "$message"
-		continue
-	fi
+	#chown -R www-data:vagrant $directoryPath
+	$SCRIPTS_PATH/executeDropGraph.sh "$graphName"
+	if $reload ; then
+                $SCRIPTS_PATH/executeReload.sh "$graphName"
+        else
+                $SCRIPTS_PATH/executeLoadDir.sh "$directoryPath" "*" "$graphName"
+                if [ $? -ne 0 ]; then
+                        message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
+                        handleError "$message"
+                        continue
+                fi
+        fi
+
 	$SCRIPTS_PATH/executeLoaderRun.sh
 	if [ $? -ne 0 ]; then
 		message="Could not call the rdf_loader_run command in Virtuoso. Possible problems with Virtuoso."
