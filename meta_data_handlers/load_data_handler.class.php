@@ -20,7 +20,7 @@ UNION
 ?subset void:dataDump ?dataDump . }
 
 OPTIONAL{ ?dataDump <'.LOADING_STATUS_PREDICATE.'> ?status }
-FILTER(!bound(?status) OR (?status!=<'.LOADING_FINISHED.'>))
+FILTER(!bound(?status) OR (?status=<'.LOADING_ERROR.'>) OR (?status=<'.LOADING_QUEUED.'>)
 } }');
 
 class LoadDataHandler extends DataHandlerAdapter{   
@@ -58,10 +58,10 @@ class LoadDataHandler extends DataHandlerAdapter{
         curl_close($ch);
         logDebug("VOID content: ".$voidData);
         
-        //add metainformation
-        //$loadingStatusMetaTriple = '<'.$voidUrl.'> <'.LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
+        //add metainformation at the VOID descriptor level
+        $loadingStatusMetaTriple = '<'.$voidUrl.'> <'.LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
         $loadingGraphMetaTriple = '<'.$voidUrl.'> <'.LOADING_GRAPH_PREDICATE.'> <'.$graphName.'> ';
-        $voidData .= $loadingGraphMetaTriple;
+        $voidData .= $loadingStatusMetaTriple."\n".$loadingGraphMetaTriple;
         
         $dataStartPos=stripos($voidData, "\n<");
         $prefixes = substr($voidData, 0, $dataStartPos);

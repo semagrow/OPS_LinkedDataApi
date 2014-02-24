@@ -39,6 +39,7 @@ define('OPS_API', 'http://www.openphacts.org/api');
 define('LOADING_QUEUED', OPS_API.'/QUEUED');
 define('LOADING_IN_PROGRESS', OPS_API.'/LOADING');
 define('LOADING_FINISHED', OPS_API.'/LOADED');
+define('LOADING_ERROR', OPS_API.'/LOADING_ERROR');
 
 define('OPS_RESULT_PREDICATE', OPS_API.'#result');
 define('LOADING_STATUS_PREDICATE', OPS_API.'#loadingStatus');
