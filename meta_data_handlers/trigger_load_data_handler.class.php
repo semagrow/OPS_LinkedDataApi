@@ -23,7 +23,7 @@ class TriggerLoadDataHandler extends DataHandlerAdapter{
             $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading not triggered. Other datasets are already loading. Try again later.");
         }
         else{
-            $cmd = "/var/www/html/scripts/loadingScript.sh &> /dev/null &";
+            $cmd = "/var/www/html/scripts/loadingScript.sh datasets &> /dev/null &";
             exec('/bin/bash -c "' . addslashes($cmd) . '"');
 
             $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading triggered successfully. Use /loadingStatus for progress info.");

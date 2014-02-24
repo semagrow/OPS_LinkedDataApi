@@ -188,10 +188,8 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		}"
 		encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
-
-	else 
-		#cotinue to load next linksets 
 	fi
+	#else cotinue to load next linksets
 
 done
 

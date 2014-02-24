@@ -68,7 +68,8 @@ UNION
 UNION
 { ?subset a <http://www.openphacts.org/api/LDCLinkset> . }
 
-?subset void:dataDump ?dataDump . 
+?subset void:dataDump ?dataDump .
+}
 ?dataDump <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .
 
 } }"

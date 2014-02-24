@@ -1,6 +1,9 @@
 #!/bin/bash
 #$1 - datasets/linksets
 
+if [ $# -ne 1 ]; then
+	echo "Usage ./loadingScript.sh \"datasets\"/\"linksets\" "
+fi
 
 #set -x
 #trap read debug
@@ -13,7 +16,7 @@ export META_GRAPH_NAME="http://www.openphacts.org/api/datasetDescriptorsTest"
 
 
 #get the list of datasets to be loaded
-if [ "$1" -eq "datasets" ]; then
+if [ "$1" == "datasets" ]; then
 	LOADING_PREDICATE="http://www.openphacts.org/api#datasetLoadingStatus"
 	VOID_LIST_FILE="datasetVoidDescriptorsList"
 else
@@ -30,11 +33,8 @@ UNION
 encodedQuery=$(php -r "echo urlencode(\"${URIsToUpdate}\");")
 curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2 >"$VOID_LIST_FILE"
 
-if [ "$1" -eq "datasets" ]; then
+if [ "$1" == "datasets" ]; then
 	$SCRIPTS_PATH/loadDatasets.sh
-else
+elif [ "$1" == "linksets" ]; then
 	$SCRIPTS_PATH/loadLinksets.sh
 fi
-
-
-

@@ -44,6 +44,7 @@ define('LOADING_ERROR', OPS_API.'/LOADING_ERROR');
 define('OPS_RESULT_PREDICATE', OPS_API.'#result');
 define('DATASET_LOADING_STATUS_PREDICATE', OPS_API.'#datasetLoadingStatus');
 define('LINKSET_LOADING_STATUS_PREDICATE', OPS_API.'#linksetLoadingStatus');
+define('LOADING_STATUS_PREDICATE', OPS_API.'#loadingStatus');
 define('LOADING_GRAPH_PREDICATE', OPS_API.'#graphName');
 
 define ('INIT_CACHEABLE', 0);
