@@ -25,12 +25,13 @@
         api:variable <#uri> ;
         api:variable <#graph> ;  
 	api:vocabulary <http://rdfs.org/ns/void#> ;
-	api:description "An API configuration to load data in the OpenPhacts System" ;
+	api:description "An API configuration to load data into the OpenPhacts System" ;
 	api:endpoint [ 
 		a api:TriggerLoadEndpoint ;
-		api:name "Trigger Loading" ;
-		api:description "Load a new dataset based on the input VOID header";
-		api:uriTemplate "/triggerLoading" ;
-		api:exampleRequestPath "/triggerLoading";
+		api:name "Trigger Linkset Loading" ;
+		api:description "Trigger the loading of queued linksets";
+		api:uriTemplate "/triggerLinksetLoading" ;
+		api:loadingCommand "/var/www/html/scripts/loadingScript.sh linksets";
+		api:exampleRequestPath "/triggerLinksetLoading";
 		] .
 
