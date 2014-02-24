@@ -30,10 +30,23 @@
 	api:name "loadingStatusViewer" ;
 	api:template 
 "<http://www.openphacts.org/linked_data_cache> ops:hasDatasetDescriptor ?description .
-?description ops:loadingStatus ?status ;
-	ops:errorMessage ?message . ";
+?description ops:linksetLoadingStatus ?linksetStatus ;
+	ops:datasetLoadingStatus ?datasetStatus ;
+	ops:dataDump ?dataDump ;
+	ops:errorMessage ?message . 
+?dataDump ops:loadingStatus ?dataDumpStatus .";
 	api:where
 "GRAPH <http://www.openphacts.org/api/datasetDescriptorsTest> { 
-?description ops:loadingStatus ?status .
+?description ops:linksetLoadingStatus ?linksetStatus .
+?description ops:datasetLoadingStatus ?datasetStatus .
 OPTIONAL{ ?description ops:errorMessage ?message .}
+
+?description foaf:primaryTopic ?dataset .
+{ ?dataset void:dataDump ?dataDump . }
+UNION
+{ ?dataset void:subset+ ?subset .
+?subset void:dataDump ?dataDump .}
+
+?dataDump ops:loadingStatus ?dataDumpStatus .
+
 }" .
