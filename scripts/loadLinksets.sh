@@ -65,7 +65,9 @@ UNION
 { ?dataset void:subset+ ?subset .
 ?subset a void:Linkset . 
 ?subset void:dataDump ?linksetDump . 
-?linksetDump <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .
+{?linksetDump <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/QUEUED> .}
+UNION
+{?linksetDump <http://www.openphacts.org/api#loadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .}
 }
 } }"
 	encodedQuery=$(php -r "echo urlencode(\"${linksetDumpsQuery}\");")
@@ -94,7 +96,7 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 	encodedQuery=$(php -r "echo urlencode(\"${getGraphQuery}\");")
 	graphName=$(curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery&format=csv" | tr -d '\"' | tail -n +2)
 	dirName=$(echo "$graphName" | sed "s,.*://,," | tr '/' '_') #remove prefix (e.g. http://) and replace '/' with '_' in the rest of the file
-	dirName=$(echo "$dirName\_linksets")
+	dirName=$(echo "${dirName}_linksets")
 	directoryPath="$DATA_DIR/$dirName"
 	#rm -rf "$directoryPath"
 	mkdir -p "$directoryPath"
@@ -144,17 +146,19 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		#load dump into the IMS
 		echo "Loading linksets in $directoryPath/dumpDir_$i in the IMS .."
 	
-		echo "<?xml version=\"1.0\"?><loadSteps>" >load.xml
-		find $(pwd) -maxdepth 1 -type f -exec echo "<linkset>file://{}</linkset>">>load.xml \;
-		echo "</loadSteps>" >>load.xml
+		echo "<?xml version=\"1.0\"?><loadSteps>" >../load.xml
+		#echo "<void>$voidDescriptor</void>" >>../load.xml
+		find $(pwd) -maxdepth 1 -type f -exec echo "<linkset>file://{}</linkset>">>../load.xml \;
+		echo "</loadSteps>" >>../load.xml
 	
+		cd ..
 		$SCRIPTS_PATH/imsLoad.sh "$(pwd)/load.xml"
 		if [ $? -ne 0 ]; then
 			message="Could not load linksets for $voidDescriptor in the IMS. Please check for errors in the mappings."
 			handleError "$message"
-			echo "<?xml version=\"1.0\"?><loadSteps><recover/></loadSteps>" >load.xml
-			$SCRIPTS_PATH/imsLoad.sh "$(pwd)/load.xml"
-			break;
+			echo "<?xml version=\"1.0\"?><loadSteps><recover/></loadSteps>" >recoveryLoad.xml
+			$SCRIPTS_PATH/imsLoad.sh "$(pwd)/recoveryLoad.xml"
+			continue
 		fi
 
 		#imsLoading OK, update status for the linkset Dump
@@ -168,7 +172,6 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		encodedQuery=$(php -r "echo urlencode(\"${updateDataDumpStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 
-		cd ..
 		i=$((i+1))
 	done < "$linksetDumpListPath"
 		
