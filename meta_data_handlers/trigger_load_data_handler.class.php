@@ -29,7 +29,7 @@ class TriggerLoadDataHandler extends DataHandlerAdapter{
             $cmd = $loadingCommand." &> /dev/null &";
             exec('/bin/bash -c "' . addslashes($cmd) . '"');
 
-            $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading triggered successfully. Use /loadingStatus for progress info.");
+            $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading triggered successfully. Use /getLoadingStatus for progress info.");
         }
 
         $this->Response->cacheable = NOT_CACHEABLE;
