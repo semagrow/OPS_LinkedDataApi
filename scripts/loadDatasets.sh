@@ -18,12 +18,12 @@ function handleError {
 	}}
 
 	DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-		<$voidDescriptor> <http://www.openphacts.org/api#errorMessage> ?o2 .	
+		<$voidDescriptor> <http://www.openphacts.org/api#datasetErrorMessage> ?o2 .	
 	}}
 
 	INSERT IN GRAPH <$META_GRAPH_NAME> {
 		<$voidDescriptor> <http://www.openphacts.org/api#datasetLoadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .
-	        <$voidDescriptor> <http://www.openphacts.org/api#errorMessage> \\\""${1}"\\\"
+	        <$voidDescriptor> <http://www.openphacts.org/api#datasetErrorMessage> \\\""${1}"\\\"
 	}"
 	encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 	curl "http://$SERVER_NAME:8890/sparql?query=${encodedQuery}"
@@ -83,7 +83,7 @@ UNION
 }}
 
 DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-<$voidDescriptor> <http://www.openphacts.org/api#errorMessage> ?o2 .
+<$voidDescriptor> <http://www.openphacts.org/api#datasetErrorMessage> ?o2 .
 }}
 
 INSERT IN GRAPH <$META_GRAPH_NAME> {

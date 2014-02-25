@@ -18,12 +18,12 @@ function handleError {
 	}}
 
 	DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-		<$voidDescriptor> <http://www.openphacts.org/api#errorMessage> ?o2 .	
-	}}
+                <$dumpURI> <http://www.openphacts.org/api#errorMessage> ?o2 .     
+        }}
 
 	INSERT IN GRAPH <$META_GRAPH_NAME> {
 		<$voidDescriptor> <http://www.openphacts.org/api#linksetLoadingStatus> <http://www.openphacts.org/api/LOADING_ERROR> .
-	        <$voidDescriptor> <http://www.openphacts.org/api#errorMessage> \\\""${1}"\\\"
+	        <$dumpURI> <http://www.openphacts.org/api#errorMessage> \\\""${1}"\\\"
 	}"
 	encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 	curl "http://$SERVER_NAME:8890/sparql?query=${encodedQuery}"
@@ -80,7 +80,7 @@ UNION
 }}
 
 DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
-<$voidDescriptor> <http://www.openphacts.org/api#errorMessage> ?o2 .	
+<$voidDescriptor> <http://www.openphacts.org/api#linksetErrorMessage> ?o2 .	
 }}
 
 INSERT IN GRAPH <$META_GRAPH_NAME> {
@@ -125,7 +125,7 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		echo "Downloading linkset dumps in $directoryPath/dumpDir_$i .."
 		wget "$dumpURI"
 		if [ $? -ne 0 ]; then
-			message="Could not download $dumpURI . Aborting the Linkset Load for $voidDescriptor . Please fix the VOID header for this linkset!"
+			message="Could not download $dumpURI . Skipping this linkset dump!"
 			handleError "$message"
 			break;
 		fi
@@ -154,7 +154,7 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		cd ..
 		$SCRIPTS_PATH/imsLoad.sh "$(pwd)/load.xml"
 		if [ $? -ne 0 ]; then
-			message="Could not load linksets for $voidDescriptor in the IMS. Please check for errors in the mappings."
+			message="Could not load linksets from $dumpURI the IMS. Please check for errors in the mappings. Skipping to next dump."
 			handleError "$message"
 			echo "<?xml version=\"1.0\"?><loadSteps><recover/></loadSteps>" >recoveryLoad.xml
 			$SCRIPTS_PATH/imsLoad.sh "$(pwd)/recoveryLoad.xml"

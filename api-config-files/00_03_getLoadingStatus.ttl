@@ -21,8 +21,8 @@
 		api:name "Get Loading Status" ;
 		api:itemTemplate "http://www.openphacts.org/linked_data_cache" ;
 		api:description "Get loading status" ;
-		api:uriTemplate "/loadingStatus" ;
-		api:exampleRequestPath "/loadingStatus";
+		api:uriTemplate "/getLoadingStatus" ;
+		api:exampleRequestPath "/getLoadingStatus";
 		api:viewer <#loadingStatusViewer> ;
 		api:defaultViewer <#loadingStatusViewer> ] .
 
@@ -33,13 +33,15 @@
 ?description ops:linksetLoadingStatus ?linksetStatus ;
 	ops:datasetLoadingStatus ?datasetStatus ;
 	ops:dataDump ?dataDump ;
-	ops:errorMessage ?message . 
-?dataDump ops:loadingStatus ?dataDumpStatus .";
+	ops:datasetErrorMessage ?datasetMessage .
+?dataDump ops:loadingStatus ?dataDumpStatus ;
+	ops:errorMessage ?linksetMessage .
+";
 	api:where
 "GRAPH <http://www.openphacts.org/api/datasetDescriptorsTest> { 
 ?description ops:linksetLoadingStatus ?linksetStatus .
 ?description ops:datasetLoadingStatus ?datasetStatus .
-OPTIONAL{ ?description ops:errorMessage ?message .}
+OPTIONAL{ ?description ops:datasetErrorMessage ?datasetMessage .}
 
 ?description foaf:primaryTopic ?dataset .
 { ?dataset void:dataDump ?dataDump . }
@@ -48,5 +50,6 @@ UNION
 ?subset void:dataDump ?dataDump .}
 
 ?dataDump ops:loadingStatus ?dataDumpStatus .
+OPTIONAL{ ?dataDump ops:errorMessage ?linksetMessage .}
 
 }" .
