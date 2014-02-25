@@ -102,14 +102,6 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 	directoryPath="$DATA_DIR/$dirName"
 	#rm -rf "$directoryPath"
 	mkdir "$directoryPath"
-	if [ $? -ne 0 ]; then #check if directory existed
-		#directory existed, means we are dealing with a reload
-		echo "Reload true for $graphName"
-		reload=true
-	else
-		echo "Reload false for $graphName"
-		reload=false
-	fi
 	cd "$directoryPath"
 
 	#download the data dumps
@@ -154,15 +146,12 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 	cd "$workDir"
 	#chown -R www-data:vagrant $directoryPath
 	$SCRIPTS_PATH/executeDropGraph.sh "$graphName"
-	if $reload ; then
-                $SCRIPTS_PATH/executeReload.sh "$graphName"
-        else
-                $SCRIPTS_PATH/executeLoadDir.sh "$directoryPath" "*" "$graphName"
-                if [ $? -ne 0 ]; then
-                        message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
-                        handleError "$message"
-                        continue
-                fi
+	$SCRIPTS_PATH/executeCommand.sh "delete from load_list where ll_graph='$graphName'"
+        $SCRIPTS_PATH/executeLoadDir.sh "$directoryPath" "*" "$graphName"
+        if [ $? -ne 0 ]; then
+        	message="Could not call the ld_dir script in Virtuoso. Dataset URI may exist already in the load_list table"
+                handleError "$message"
+                continue
         fi
 
 	$SCRIPTS_PATH/executeLoaderRun.sh
