@@ -58,6 +58,9 @@ class LoadDataHandler extends DataHandlerAdapter{
         curl_close($ch);
         logDebug("VOID content: ".$voidData);
         
+        //call script to delete previous VOID info from meta graph
+        
+        
         //add metainformation at the VOID descriptor level
         $datasetLoadingStatusMetaTriple = '<'.$voidUrl.'> <'.DATASET_LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
         $linksetLoadingStatusMetaTriple = '<'.$voidUrl.'> <'.LINKSET_LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
