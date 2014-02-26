@@ -178,6 +178,9 @@ class LinkedDataApiResponse {
         		case API.'TriggerLoadEndpoint' :
         		    $this->dataHandler = DataHandlerFactory::createTriggerLoadEndpoint($dataHandlerParams);
         		    break;
+        		case API.'TriggerCommandEndpoint' :
+        		    $this->dataHandler = DataHandlerFactory::createTriggerCommandHandler($dataHandlerParams);
+        		    break;
         		default:{
         			$this->setStatusCode(HTTP_Internal_Server_Error);
         			logError("Unsupported Endpoint Type");

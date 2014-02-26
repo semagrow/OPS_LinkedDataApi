@@ -180,7 +180,6 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 	#if successful, update loading status in the meta-graph
 	if $success ; then
 		echo "Successfully loaded $voidDescriptor"
-		$SCRIPTS_PATH/executeCheckpoint.sh
 
 		updateStatusTemplate="DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
 			<$voidDescriptor> <http://www.openphacts.org/api#linksetLoadingStatus> ?o .
@@ -191,13 +190,21 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		}"
 		encodedQuery=$(php -r "echo urlencode(\"${updateStatusTemplate}\");")
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
+
+		#update transitivities status
+		updateTransitvitiesStatusTemplate="DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
+<http://www.openphacts.org/ops_system> <http://www.openphacts.org/api#transitivitiesStatus> ?status .
+}}
+
+INSERT IN GRAPH <$META_GRAPH_NAME> {
+<http://www.openphacts.org/ops_system> <http://www.openphacts.org/api#transitivitiesStatus> <http://www.openphacts.org/api/OUTDATED> .
+}"
+		encodedQuery=$(php -r "echo urlencode(\"${updateDataDumpStatusTemplate}\");")
+		url "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
+		
 	fi
 	#else cotinue to load next linksets
 
+	
 done
-
-#echo "<?xml version=\"1.0\"?><loadSteps>" >load.xml
-#echo "<doTransitive/>" >>load.xml
-#echo "</loadSteps>" >>load.xml
-#$SCRIPTS_PATH/imsLoad.sh
 

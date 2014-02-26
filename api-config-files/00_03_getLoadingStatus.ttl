@@ -19,7 +19,7 @@
 	api:endpoint [ 
 		a api:ItemEndpoint ;
 		api:name "Get Loading Status" ;
-		api:itemTemplate "http://www.openphacts.org/linked_data_cache" ;
+		api:itemTemplate "http://www.openphacts.org/ops_system" ;
 		api:description "Get loading status" ;
 		api:uriTemplate "/getLoadingStatus" ;
 		api:exampleRequestPath "/getLoadingStatus";
@@ -29,7 +29,8 @@
 <#loadingStatusViewer> a api:Viewer ;
 	api:name "loadingStatusViewer" ;
 	api:template 
-"<http://www.openphacts.org/linked_data_cache> ops:hasDatasetDescriptor ?description .
+"<http://www.openphacts.org/ops_system> ops:hasDatasetDescriptor ?description ;
+	ops:transitivitiesStatus ?transitivitiesStatus .
 ?description ops:linksetLoadingStatus ?linksetStatus ;
 	ops:datasetLoadingStatus ?datasetStatus ;
 	ops:dataDump ?dataDump ;
@@ -52,4 +53,5 @@ UNION
 ?dataDump ops:loadingStatus ?dataDumpStatus .
 OPTIONAL{ ?dataDump ops:errorMessage ?linksetMessage .}
 
+OPTIONAL{<http://www.openphacts.org/ops_system> ops:transitivitiesStatus ?transitivitiesStatus .}
 }" .

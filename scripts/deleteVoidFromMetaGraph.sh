@@ -4,14 +4,12 @@
 
 source /vagrant/env.sh
 META_GRAPH="$2"
-TEMP_META_GRAPH="http://www.openphacts.org/api/tempDatasetDescriptorsTest"
 SERVER_NAME="$3"
+TEMP_META_GRAPH="http://www.openphacts.org/api/tempDatasetDescriptorsTest"
+
 
 #clear temp graph
-#CLEAR_COMMAND="CLEAR GRAPH <$TEMP_META_GRAPH>"
 $SCRIPTS_PATH/executeSparqlCommand.sh "CLEAR GRAPH <$TEMP_META_GRAPH>"
-#encodedQuery=$(php -r "echo urlencode(\"${CLEAR_COMMAND}\");")
-#curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 
 #insert the VOID header into the temp graph
 echo "Inserting VOID header into $TEMP_META_GRAPH"
@@ -26,11 +24,6 @@ wget "$1"
 
 $SCRIPTS_PATH/executeLoadDir.sh "$TEMP_DIR" "*" "$TEMP_META_GRAPH"
 $SCRIPTS_PATH/executeLoaderRun.sh
-
-#encodedQuery=$(php -r "echo urlencode(\"${INSERT_QUERY}\");")
-#param=$(echo "'query=$INSERT_QUERY'")
-#echo "Param: $param"
-#curl -d "$param" http://$SERVER_NAME:8890/sparql/
 
 #query the header for the list of subjects
 echo "Retrieving the list of subjects .."

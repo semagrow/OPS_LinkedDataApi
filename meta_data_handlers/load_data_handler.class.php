@@ -59,8 +59,8 @@ class LoadDataHandler extends DataHandlerAdapter{
         logDebug("VOID content: ".$voidData);
         
         //call script to delete previous VOID info from meta graph
-	$cmd="/var/www/html/scripts/deleteVoidFromMetaGraph.sh $voidUrl ".DATASET_DESCRIPTORS_GRAPH." localhost &>/dev/null";
-	exec('/bin/bash -c "' . addslashes($cmd) . '"');
+        $cmd="/var/www/html/scripts/deleteVoidFromMetaGraph.sh $voidUrl ".DATASET_DESCRIPTORS_GRAPH." localhost &>/dev/null";
+        exec('/bin/bash -c "' . addslashes($cmd) . '"');
         
         //add metainformation at the VOID descriptor level
         $datasetLoadingStatusMetaTriple = '<'.$voidUrl.'> <'.DATASET_LOADING_STATUS_PREDICATE.'> <'.LOADING_QUEUED.'> .';
@@ -88,7 +88,6 @@ class LoadDataHandler extends DataHandlerAdapter{
         }
 
         //insert meta information at the data dumps level
-        //TODO add force parameter to force re-load
         $dataDumpsQuery =  preg_replace('/%%voidDescriptorPlaceHolder%%/', $voidUrl, DATA_DUMPS_QUERY_TEMPLATE);
         $response = $this->SparqlEndpoint->graph($dataDumpsQuery, 'text/tab-separated-values;q=1');
         if(!$response->is_success()){
