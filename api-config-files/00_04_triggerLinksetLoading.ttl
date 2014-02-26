@@ -31,7 +31,7 @@
 		api:name "Trigger Linkset Loading" ;
 		api:description "Trigger the loading of queued linksets";
 		api:uriTemplate "/triggerLinksetLoading" ;
-		api:loadingCommand "/var/www/html/scripts/loadingScript.sh linksets";
+		api:loadingCommand "/var/www/html/scripts/triggerLinksetsLoading.sh";
 		api:exampleRequestPath "/triggerLinksetLoading";
 		] .
 

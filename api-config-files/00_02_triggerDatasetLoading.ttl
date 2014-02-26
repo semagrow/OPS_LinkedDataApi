@@ -31,7 +31,7 @@
 		api:name "Trigger Dataset Loading" ;
 		api:description "Trigger the loading of queued datasets";
 		api:uriTemplate "/triggerDatasetLoading" ;
-		api:loadingCommand "/var/www/html/scripts/loadingScript.sh datasets";
+		api:loadingCommand "/var/www/html/scripts/triggerDatasetsLoading.sh";
 		api:exampleRequestPath "/triggerDatasetLoading";
 		] .
 

@@ -25,8 +25,9 @@ class TriggerLoadDataHandler extends DataHandlerAdapter{
         $loadingCommand = $this->ConfigGraph->get_first_literal($this->ConfigGraph->getEndpointUri(), API.'loadingCommand');
         
         $check = shell_exec(CHECK_IF_CMD_RUNNING_SCRIPT.' '.$loadingCommand.' 2>/dev/null');
-        if ($check == 'true'){
-            $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading not triggered. Other datasets are already loading. Try again later.");
+	logDebug("Check if another process is running: ".$check);
+        if (trim($check) == 'true'){
+            $this->DataGraph->add_literal_triple($this->pageUri, OPS_RESULT_PREDICATE, "Loading not triggered. Process is already running. Try again later.");
         }
         else{
             logDebug($loadingCommand." triggered");
