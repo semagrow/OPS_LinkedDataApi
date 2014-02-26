@@ -141,7 +141,7 @@ class LinkedDataApiResponse {
         }
         
         switch ($this->ConfigGraph->getEndpointType()){
-            case API.'LoadEndpoint': case API.'TriggerLoadEndpoint':{
+            case API.'LoadEndpoint': case API.'TriggerLoadEndpoint': case API.'TriggerCommandEndpoint': {
                 $noCacheRequestFactory = new HttpRequestFactory();
                 $noCacheRequestFactory->read_from_cache(FALSE);
                 $this->SparqlEndpoint = new SparqlService($sparqlEndpointUri, $credentials, $noCacheRequestFactory); 
@@ -639,7 +639,7 @@ class LinkedDataApiResponse {
 	            case PUELIA.'SearchEndpoint':
 	                $pageUri = $this->Request->getUriWithPageParam();
 	                break;
-	            case API.'ItemEndpoint': case API.'ExternalHTTPService': case API.'LoadEndpoint': case API.'TriggerLoadEndpoint':
+	            case API.'ItemEndpoint': case API.'ExternalHTTPService': case API.'LoadEndpoint': case API.'TriggerLoadEndpoint': case API.'TriggerCommandEndpoint':
 	                $pageUri = $this->Request->getUri();
 	                break;
 	            default:

@@ -120,9 +120,10 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 		#download linkset dump in a separate directory
 
-		mkdir "dumpDir_$i"
-		cd "dumpDir_$i"
-		echo "Downloading linkset dumps in $directoryPath/dumpDir_$i .."
+		rm -rf "dumpDir_test"
+		mkdir "dumpDir_test"
+		cd "dumpDir_test"
+		echo "Downloading linkset dumps .."
 		wget "$dumpURI"
 		if [ $? -ne 0 ]; then
 			message="Could not download $dumpURI . Skipping this linkset dump!"
@@ -160,6 +161,9 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 			$SCRIPTS_PATH/imsLoad.sh "$(pwd)/recoveryLoad.xml"
 			continue
 		fi
+		
+		#move linksets out of the temp dir
+		mv dumpDir_test/* . 
 
 		#imsLoading OK, update status for the linkset Dump
 		updateDataDumpStatusTemplate="DELETE WHERE { GRAPH <$META_GRAPH_NAME> {
@@ -199,8 +203,8 @@ INSERT IN GRAPH <$META_GRAPH_NAME> {
 INSERT IN GRAPH <$META_GRAPH_NAME> {
 <http://www.openphacts.org/ops_system> <http://www.openphacts.org/api#transitivitiesStatus> <http://www.openphacts.org/api/OUTDATED> .
 }"
-		encodedQuery=$(php -r "echo urlencode(\"${updateDataDumpStatusTemplate}\");")
-		url "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
+		encodedQuery=$(php -r "echo urlencode(\"${updateTransitvitiesStatusTemplate}\");")
+		curl "http://$SERVER_NAME:8890/sparql?query=$encodedQuery"
 		
 	fi
 	#else cotinue to load next linksets

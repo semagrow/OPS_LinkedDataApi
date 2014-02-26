@@ -31,7 +31,7 @@
 		api:name "Trigger Transitives Computation" ;
 		api:description "Trigger the computation of transitives in the IMS";
 		api:uriTemplate "/triggerTransitivesComputation" ;
-		api:command "/var/www/html/scripts/computeTransitives.sh";
+		api:command "/var/www/html/scripts/computeTransitivities.sh";
 		api:userMessage "The computation of transitives has been triggered in the background. Use /getLoadingStatus API call to check progress info";
 		api:exampleRequestPath "/triggerTransitivesComputation";
 		] .
